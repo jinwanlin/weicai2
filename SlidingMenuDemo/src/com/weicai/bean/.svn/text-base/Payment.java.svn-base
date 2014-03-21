@@ -1,0 +1,175 @@
+package co.caicai.bean;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import co.caicai.daoCore.Id;
+import co.caicai.daoCore.Transient;
+
+/**
+ * @author jiuwuerliu@sina.com
+ * 
+ *         数据库实体对象
+ */
+public class Payment {
+
+	/**
+	 * 主键字段
+	 */
+	@Id
+	private int id;
+	private Date createdAt;
+	private Date updatedAt;
+	/** 操作者 */
+	private String operatorName; 
+	/** 交易金额 */
+	private double amount;
+	/** 余额 */
+	private double overage;
+	private int orderId;
+	private String orderSn;
+
+	/**
+	 * 非数据库字段
+	 */
+	@Transient
+	private String detail;
+
+	@Transient
+	private String[] amountArray;
+
+	public Payment() {
+	}
+
+	public Payment(int id) {
+		this.id = id;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
+	}
+
+
+
+
+	public String getOperatorName() {
+		return operatorName;
+	}
+
+	public void setOperatorName(String operatorName) {
+		this.operatorName = operatorName;
+	}
+
+	public int getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
+	}
+
+	public String getOrderSn() {
+		return orderSn;
+	}
+
+	public void setOrderSn(String orderSn) {
+		this.orderSn = orderSn;
+	}
+
+	public double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
+
+	public double getOverage() {
+		return overage;
+	}
+
+	public void setOverage(double overage) {
+		this.overage = overage;
+	}
+
+	public String[] getAmountArray() {
+		return amountArray;
+	}
+
+	public void setAmountArray(String[] amountArray) {
+		this.amountArray = amountArray;
+	}
+
+	public static List<Payment> jsonToList(JSONArray array) {
+		List<Payment> list = new ArrayList<Payment>();
+		if (array != null && array.length() > 0) {
+			for (int i = 0; i < array.length(); i++) {
+				try {
+					JSONObject p = array.getJSONObject(i);
+					Payment order = new Payment();
+					order.setId(p.getInt("id"));
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					try {
+						Date createdAt = sdf.parse(p.getString("created_at"));
+						order.setCreatedAt(createdAt);
+					} catch (ParseException e) {
+					}
+					try {
+						Date updatedAt = sdf.parse(p.getString("updated_at"));
+						order.setUpdatedAt(updatedAt);
+					} catch (ParseException e) {
+					}
+					
+					order.setOrderSn(p.getString("order_sn"));
+					if (!"".equals(p.getString("order_id"))){
+						order.setOrderId(p.getInt("order_id"));
+					}
+					order.setOperatorName(p.getString("operator_name"));
+					order.setAmount(p.getDouble("amount"));
+					order.setOverage(p.getDouble("overage"));
+					list.add(order);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+
+}

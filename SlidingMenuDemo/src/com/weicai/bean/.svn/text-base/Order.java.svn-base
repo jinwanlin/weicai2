@@ -1,0 +1,153 @@
+package co.caicai.bean;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import co.caicai.daoCore.Id;
+import co.caicai.daoCore.Table;
+import co.caicai.daoCore.Transient;
+
+/**
+ * @author jiuwuerliu@sina.com
+ * 
+ *         数据库实体对象
+ */
+@Table(name = "t_order")
+public class Order {
+
+	/**
+	 * 主键字段
+	 */
+	@Id
+	private int id;
+	private Date createdAt;
+	private Date updatedAt;
+
+
+	private String sn;
+	private double orderSum;
+	private double shipSum;
+	private String state;
+
+	/**
+	 * 非数据库字段
+	 */
+	@Transient
+	private String detail;
+
+	@Transient
+	private String[] amountArray;
+
+	public Order() {
+	}
+
+	public Order(int id) {
+		this.id = id;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
+	}
+
+
+
+
+
+
+	
+	public double getOrderSum() {
+		return orderSum;
+	}
+
+	public void setOrderSum(double orderSum) {
+		this.orderSum = orderSum;
+	}
+
+	public double getShipSum() {
+		return shipSum;
+	}
+
+	public void setShipSum(double shipSum) {
+		this.shipSum = shipSum;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String[] getAmountArray() {
+		return amountArray;
+	}
+
+	public void setAmountArray(String[] amountArray) {
+		this.amountArray = amountArray;
+	}
+
+	public String getSn() {
+		return sn;
+	}
+
+	public void setSn(String sn) {
+		this.sn = sn;
+	}
+
+	public static List<Order> jsonToList(JSONArray array) {
+		List<Order> list = new ArrayList<Order>();
+		if (array != null && array.length() > 0) {
+			for (int i = 0; i < array.length(); i++) {
+				try {
+					JSONObject p = array.getJSONObject(i);
+					Order order = new Order();
+					order.setId(p.getInt("id"));
+					order.setSn(p.getString("sn"));
+					order.setOrderSum(p.getDouble("order_sum"));
+					order.setShipSum(p.getDouble("ship_sum"));
+					order.setState(p.getString("state"));
+//					order.setUpdatedAt(p.getString("updated_at"));
+					list.add(order);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+
+}

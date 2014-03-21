@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/tab_bg" >
+
+        <TextView
+            android:id="@+id/header_title"
+            android:layout_width="125dp"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="账单"
+            android:textColor="#fff"
+            android:textSize="20.0dip" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/basic_info_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="15dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="left"
+                android:paddingLeft="15dp"
+                android:paddingTop="15dp"
+                android:text="余额："
+                android:textSize="25.0dip" />
+
+            <TextView
+                android:id="@+id/overage"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="15dp"
+                android:gravity="right"
+                android:text=""
+                android:textColor="#f00"
+                android:textSize="40.0dip" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="left"
+            android:paddingLeft="10dip"
+            android:text="充值支付记录"
+            android:textColor="#666"
+            android:textSize="15.0dip" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.8dip"
+            android:background="#aaa" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/paymentListLV"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <RelativeLayout
+        android:id="@+id/no_values_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone" >
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="没有记录"
+            android:textSize="20.0dip" />
+    </RelativeLayout>
+
+</LinearLayout>
