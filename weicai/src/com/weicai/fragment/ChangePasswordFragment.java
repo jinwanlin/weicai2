@@ -1,9 +1,10 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.weicai.R;
+import com.weicai.activity.BaseActivity;
+import com.weicai.activity.LoadingActivity;
+import com.weicai.activity.MainActivity;
 import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.api.CaiCai;
 import com.weicai.api.UserAPI;
@@ -23,12 +27,13 @@ public class ChangePasswordFragment extends Fragment implements OnClickListener 
 
 	private TextView message;
 	private EditText old_password_edit_text, new_password_edit_text;
-	private MainActivity mainActivity;
 	private UserDao userDao;
 
 	
-	public void setMainActivity(MainActivity mainActivity) {
-		this.mainActivity = mainActivity;
+	private Context context;
+	
+	public void setContext(Context context){
+		this.context = context;
 	}
 
 	@Override
@@ -38,7 +43,7 @@ public class ChangePasswordFragment extends Fragment implements OnClickListener 
 		settingLayout.findViewById(R.id.back).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mainActivity.back();
+				((MainActivity)context).back();
 			}
 		});
 
@@ -61,7 +66,7 @@ public class ChangePasswordFragment extends Fragment implements OnClickListener 
 		@Override
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
-	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
+	        intent.setClass((MainActivity)context, LoadingActivity.class);//跳转到加载界面
 	        startActivity(intent);	
 	        
 			long user_id = userDao.first().getId();

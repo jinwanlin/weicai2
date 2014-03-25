@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,13 +23,11 @@ import com.weicai.api.CaiCai;
 import com.weicai.api.ProductAPI;
 import com.weicai.bean.ProductType;
 import com.weicai.dao.SearchHistoryDao;
-//import android.widget.AbsListView.LayoutParams;
 
 public class MenuFragment extends Fragment {
 	public static SearchHistoryDao searchHistoryDao;
 	public static ProductType[] productTypes;
 	public static ListView product_items;
-//	private LinearLayout product_types;
 	private Context context;
 	
 	public void setContext(Context context){
@@ -40,10 +38,6 @@ public class MenuFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View menu_layout = inflater.inflate(layout.menu2, container, false);
 
-		
-		Log.i("MenuFragment--", "MenuFragment========+++++++++++");
-
-//		product_types = (LinearLayout) menu_layout.findViewById(R.id.product_types);
 		product_items = (ListView) menu_layout.findViewById(R.id.product_items);
 		new productTypesTask().execute(0);
 		return menu_layout;

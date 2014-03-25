@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +25,8 @@ import android.widget.TextView;
 
 import com.weicai.R;
 import com.weicai.activity.BaseActivity.NetTask;
+import com.weicai.activity.LoadingActivity;
+import com.weicai.activity.MainActivity;
 import com.weicai.adapter.OrderItemListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;
@@ -138,8 +140,8 @@ public class OrderFragment extends Fragment implements OnClickListener {
 				if (status) {
 //					ProductFragment.last_order_state = Order.State.valueOf(json.getString("state").toUpperCase());
 //					ProductFragment.changeOrderState();
-					((MainActivity)context).productsFragment.RefreshProduct("Vegetable", null, null);
-					
+//					((MainActivity)context).productFragment.RefreshProduct("Vegetable", null, null);
+					((MainActivity)context).searchProduct("Vegetable", null, null);
 					Order order = Order.jsonToOrder(json);
 					state.setText(order.getStateStr());
 					cancel_order.setVisibility(View.GONE);

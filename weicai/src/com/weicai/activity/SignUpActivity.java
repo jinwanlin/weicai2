@@ -39,6 +39,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.sign_up);
+		MyApplication.getInstance().addActivity(this);
 		BaseActivity.baseActivity = this;
 
 		userDao = UserDao.getInstance();
@@ -149,7 +150,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
 			intent.putExtra("loading_text", "注册中...");
-	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
+	        intent.setClass(SignUpActivity.this, LoadingActivity.class);//跳转到加载界面
 	        startActivity(intent);	
 	        
 			String userName = phone_edit_text.getText().toString();
@@ -166,18 +167,18 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 			
 			JSONObject json = CaiCai.StringToJSONObject(result);
 
-			int status = -1;
+			boolean state = false;
 			String message = "";
 			JSONObject userObj = null;
 			try {
-				status = json.getInt("status");
+				state = json.getBoolean("state");
 				message = json.getString("message");
 				userObj = json.getJSONObject("user");
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 
-			if (status == 0) {
+			if (state) {
 
 				User user = User.jsonToUser(userObj);
 				userDao.insert(user);
@@ -203,9 +204,9 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 
 		@Override
 		protected String doInBackground(Integer... params) {
-			Intent intent = new Intent();
-	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
-	        startActivity(intent);	
+//			Intent intent = new Intent();
+//	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
+//	        startActivity(intent);	
 	        
 			return UserAPI.has_validate_code();
 		}
@@ -240,9 +241,13 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 
 		@Override
 		protected String doInBackground(Integer... params) {
-			Intent intent = new Intent();
-	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
-	        startActivity(intent);	
+			try {
+				Intent intent = new Intent();
+				intent.setClass(SignUpActivity.this, LoadingActivity.class);//跳转到加载界面
+				startActivity(intent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}	
 	        
 			String userName = phone_edit_text.getText().toString();
 			return UserAPI.get_sign_up_validate_code(userName);

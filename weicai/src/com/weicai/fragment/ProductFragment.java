@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import java.util.List;
 
@@ -26,28 +26,31 @@ import android.widget.TextView;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.weicai.R;
 import com.weicai.activity.BaseActivity.NetTask;
+import com.weicai.activity.LoadingActivity;
+import com.weicai.activity.MainActivity;
 import com.weicai.adapter.ProductListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;
 import com.weicai.api.ProductAPI;
 import com.weicai.bean.Order;
 import com.weicai.bean.Product;
-import com.weicai.bean.SearchHistory;
 import com.weicai.dao.SearchHistoryDao;
 
 public class ProductFragment extends Fragment {
 	static final String tag = "ProductFragment";
 	private ImageButton product_type;
-
+	private LinearLayout search_ll;
 	public static ListView productItemLV;
 	public static Button auto_make_order, submit, continue_buy, search, return_all;
-	private static TextView nothing_Find;
+	private static TextView nothing_Find, search_textview;
 	private Context context;
 	public static long last_order_id;
 	public static Order.State last_order_state = Order.State.NULL;
-	// public Spinner classify_spinner;
-	// private String[] classifies = { "全部", "叶菜类", "根茎类", "瓜果类", "豆荚类", "葱姜蒜",
-	// "菌类", "水生菜" };
+
+	public String type = "Vegetable";
+	public String classify;
+	public String searchKey;
+
 	public static AlertDialog searchDialog;
 	public static SearchHistoryDao searchHistoryDao;
 
@@ -58,15 +61,15 @@ public class ProductFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		Log.i(tag, "ProductFragment");
 		View messageLayout = inflater.inflate(R.layout.products_layout, container, false);
-		searchHistoryDao = SearchHistoryDao.getInstance();
 
+		searchHistoryDao = SearchHistoryDao.getInstance();
 		productItemLV = (ListView) messageLayout.findViewById(R.id.productItem);
-//		productItemLV.addHeaderView(searchLayout());
 
 		auto_make_order = (Button) messageLayout.findViewById(R.id.auto_make_order);
 		submit = (Button) messageLayout.findViewById(R.id.submit);
 		continue_buy = (Button) messageLayout.findViewById(R.id.continue_buy);
-		// search = (Button) messageLayout.findViewById(R.id.search);
+		search_ll = (LinearLayout) messageLayout.findViewById(R.id.search_ll);
+		search_textview = (TextView) messageLayout.findViewById(R.id.search_textview);
 		return_all = (Button) messageLayout.findViewById(R.id.return_all);
 		nothing_Find = (TextView) messageLayout.findViewById(R.id.nothing_Find);
 		product_type = (ImageButton) messageLayout.findViewById(R.id.product_type);
@@ -74,33 +77,13 @@ public class ProductFragment extends Fragment {
 		submit.setOnClickListener(submitOrderButtonListner());
 		auto_make_order.setOnClickListener(autoMakeOrderButtonListner());
 		continue_buy.setOnClickListener(continueBuyButtonListner());
-		// search.setOnClickListener(searchButtonListner());
+		search_ll.setOnClickListener(searchButtonListner());
 		return_all.setOnClickListener(returnAllButtonListner());
 		product_type.setOnClickListener(productTypeButtonListner());
 
-		// ArrayAdapter classifyAdapter = new ArrayAdapter(context,
-		// android.R.layout.simple_spinner_item,
-		// java.util.Arrays.asList(classifies));
-		// classifyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// classify_spinner = (Spinner)
-		// messageLayout.findViewById(R.id.product_type);
-		// classify_spinner.setAdapter(classifyAdapter);
-		// classify_spinner.setOnItemSelectedListener(productTypeSpinnerListener());
-
-		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
-		// WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-
-		new RefreshProductsTask("Vegetable", null, null).execute(0);
-		// new InitMenu().start();
-
+		new refreshProductsTask().execute(0);
 		return messageLayout;
 	}
-
-	// class InitMenu extends Thread {
-	// public void run() {
-	// showMenu();
-	// }
-	// }
 
 	private OnClickListener productTypeButtonListner() {
 
@@ -120,8 +103,11 @@ public class ProductFragment extends Fragment {
 		};
 	}
 
+	/**
+	 * 显示菜单
+	 */
 	public void showMenu() {
-		Log.i("aa--", "showMenu===========");
+		// Log.i("aa--", "showMenu===========");
 
 		MainActivity.menu = new SlidingMenu(context);
 		MainActivity.menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
@@ -133,107 +119,46 @@ public class ProductFragment extends Fragment {
 		MainActivity.menu.setFadeDegree(0f);// 设置隐藏或显示菜单时，菜单渐变值，0，不变，1黑色，值为0－1
 		MainActivity.menu.attachToActivity((MainActivity) context, SlidingMenu.SLIDING_CONTENT);
 		MainActivity.menu.setMenu(R.layout.menu);
-		// android.support.v4.app.Fragment
 		MenuFragment menuFragment = new MenuFragment();
 		menuFragment.setContext(context);
 		((MainActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.menu, menuFragment).commit();
 	}
 
+	/**
+	 * 显示所有按钮监听
+	 * 
+	 * @return
+	 */
 	private OnClickListener returnAllButtonListner() {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				new RefreshProductsTask("Vegetable", null, null).execute(0);
+				type = "Vegetable";
+				classify = null;
+				searchKey = null;
+				new refreshProductsTask().execute(0);
 			}
 		};
 	}
 
-	// private OnClickListener searchButtonListner() {
-	// return new OnClickListener() {
-	// @Override
-	// public void onClick(View v) {
-	// List<String> keywordsList = searchHistoryDao.getKeywordsList();
-	// final ArrayAdapter<String> arrayAdapter = new
-	// ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,
-	// keywordsList);
-	//
-	// final LayoutInflater factory = LayoutInflater.from(context);
-	// final View textEntryView = factory.inflate(R.layout.search_dialog, null);
-	// ListView productItem = (ListView)
-	// textEntryView.findViewById(R.id.productItem);
-	// productItem.setAdapter(arrayAdapter);
-	//
-	// final AlertDialog dialog = new
-	// AlertDialog.Builder(context).setView(textEntryView).setPositiveButton("确定",
-	// new DialogInterface.OnClickListener() {
-	// @Override
-	// public void onClick(DialogInterface dialog, int which) {
-	// EditText editText = (EditText) textEntryView.findViewById(R.id.likeText);
-	// String searchKey = editText.getText().toString();
-	// if (searchKey != null && !searchKey.equals("")) {
-	// new RefreshProductsTask("Vegetable", null, searchKey).execute(0);
-	// }
-	// Toast.makeText(context, "搜索关键字：" + searchKey, Toast.LENGTH_SHORT).show();
-	// }
-	// }).setNegativeButton("取消", null).create();
-	//
-	// productItem.setOnItemClickListener(new OnItemClickListener() {
-	// @Override
-	// public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long
-	// arg3) {
-	// String searchKey = classifies[arg2];
-	// Log.i("11", classifies[arg2] + "");
-	// if (searchKey != null && !searchKey.equals("")) {
-	// new RefreshProductsTask("Vegetable", null, searchKey).execute(0);
-	// }
-	// Toast.makeText(context, "搜索关键字：" + searchKey, Toast.LENGTH_SHORT).show();
-	// dialog.cancel();
-	// }
-	// });
-	// dialog.show();
-	// }
-	// };
-	// }
-
-	// private AdapterView.OnItemSelectedListener productTypeSpinnerListener() {
-	// return new AdapterView.OnItemSelectedListener() {
-	// @Override
-	// public void onItemSelected(AdapterView<?> adapter, View view, int
-	// position, long id) {
-	// // String
-	// // str=(String)product_type_spinner.getAdapter().getItem((int)id);
-	// Integer classify = null;
-	// if (id > 0) {
-	// classify = Integer.parseInt(id - 1 + "");
-	// }
-	// new RefreshProductsTask("Vegetable", classify, null).execute(0);
-	// }
-	//
-	// @Override
-	// public void onNothingSelected(AdapterView<?> arg0) {
-	//
-	// }
-	// };
-	// }
-
-	/** 作为public方法给其他类调用 */
-	public void RefreshProduct(String type, String classify, String searchKey) {
-		new RefreshProductsTask("Vegetable", classify, searchKey).execute(0);
+	/**
+	 * 搜索 文本框监听
+	 * 
+	 * @return
+	 */
+	private OnClickListener searchButtonListner() {
+		return new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity) context).showSearch();
+			}
+		};
 	}
 
 	/**
 	 * 刷新商品列表
 	 */
-	private class RefreshProductsTask extends NetTask {
-		String type;
-		String classify;
-		String searchKey;
-
-		public RefreshProductsTask(String type, String classify, String searchKey) {
-			this.type = type;
-			this.classify = classify;
-			this.searchKey = searchKey;
-		}
+	private class refreshProductsTask extends NetTask {
 
 		@Override
 		protected String doInBackground(Integer... params) {
@@ -246,7 +171,6 @@ public class ProductFragment extends Fragment {
 				e.printStackTrace();
 			}
 
-			Log.i("", "searchKey:" + searchKey);
 			return ProductAPI.list(type, classify, searchKey);
 		}
 
@@ -278,7 +202,6 @@ public class ProductFragment extends Fragment {
 			if (jsonArray != null) {
 				products = Product.jsonToList(jsonArray);
 				ProductListAdapter productListAdapter = new ProductListAdapter(context, products);
-				// productItemLV.addHeaderView(searchLayout());
 				productItemLV.setAdapter(productListAdapter);
 
 				if (products.isEmpty()) {
@@ -291,13 +214,13 @@ public class ProductFragment extends Fragment {
 					return_all.setVisibility(View.VISIBLE);
 
 					if (products != null && products.size() > 0) {
-						SearchHistory searchHistory = new SearchHistory();
-						searchHistory.setId(json.getLong("search_history_id"));
-						searchHistory.setKeywords(searchKey);
-						searchHistory = searchHistoryDao.insert(searchHistory);
-						Log.i(tag, searchHistory.getId() + "");
+						searchHistoryDao.updateKeyword(json.getLong("search_history_id"), searchKey);
 					}
+					search_textview.setText(searchKey);
+				} else {
+					search_textview.setText("点击搜索");
 				}
+				
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -306,6 +229,12 @@ public class ProductFragment extends Fragment {
 
 	}
 
+	/***
+	 * 自动下单按钮监听
+	 * 
+	 * @author jinwanlin
+	 * 
+	 */
 	private OnClickListener autoMakeOrderButtonListner() {
 		return new View.OnClickListener() {
 			@Override
@@ -316,7 +245,7 @@ public class ProductFragment extends Fragment {
 	}
 
 	/***
-	 * 自动下单
+	 * 自动下单任务
 	 * 
 	 * @author jinwanlin
 	 * 
@@ -335,11 +264,20 @@ public class ProductFragment extends Fragment {
 				return;
 			}
 
-			new RefreshProductsTask("Vegetable", null, null).execute(0);
+			type = "Vegetable";
+			classify = null;
+			searchKey = null;
+			new refreshProductsTask().execute(0);
 		}
 
 	}
 
+	/***
+	 * 提交订单按钮监听
+	 * 
+	 * @author jinwanlin
+	 * 
+	 */
 	private OnClickListener submitOrderButtonListner() {
 		return new View.OnClickListener() {
 			@Override
@@ -350,7 +288,7 @@ public class ProductFragment extends Fragment {
 	}
 
 	/***
-	 * 提交订单
+	 * 提交订单任务
 	 * 
 	 * @author jinwanlin
 	 * 
@@ -394,6 +332,12 @@ public class ProductFragment extends Fragment {
 
 	}
 
+	/***
+	 * 继续购买按钮监听
+	 * 
+	 * @author jinwanlin
+	 * 
+	 */
 	private OnClickListener continueBuyButtonListner() {
 		return new View.OnClickListener() {
 			@Override
@@ -404,7 +348,7 @@ public class ProductFragment extends Fragment {
 	}
 
 	/***
-	 * 继续购买
+	 * 继续购买任务
 	 * 
 	 * @author jinwanlin
 	 * 
@@ -445,39 +389,12 @@ public class ProductFragment extends Fragment {
 
 	}
 
-	// private class Search extends NetTask {
-	//
-	// @Override
-	// protected String doInBackground(Integer... params) {
-	// return CaiCai.productsStr("Vegetable", null, searchKey);
-	// }
-	//
-	// @Override
-	// protected void onPostExecute(String result) {
-	// super.onPostExecute(result);
-	// if (result == null || result.equals("")) {
-	// return;
-	// }
-	//
-	// JSONObject json = CaiCai.StringToJSONObject(result);
-	// JSONArray jsonArray = null;
-	// try {
-	// jsonArray = json.getJSONArray("products");
-	// } catch (JSONException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// if (jsonArray != null) {
-	// List<Product> products = Product.jsonToList(jsonArray);
-	// ProductListAdapter productListAdapter = new ProductListAdapter(context,
-	// products);
-	// Log.i(tag, (productItemLV == null) + "");
-	// productItemLV.setAdapter(productListAdapter);
-	// }
-	// }
-	//
-	// }
-
+	/***
+	 * 根据订单状态改变按钮显示
+	 * 
+	 * @author jinwanlin
+	 * 
+	 */
 	public static void changeOrderState() {
 		auto_make_order.setVisibility(View.GONE);
 		submit.setVisibility(View.GONE);
@@ -502,42 +419,20 @@ public class ProductFragment extends Fragment {
 			break;
 		}
 	}
+	
+	public static void sss(){
+		ProductListAdapter.resetOrderAmount();
+		
+		for (int i = 0; i < productItemLV.getChildCount(); i++) {
+			LinearLayout l = (LinearLayout) productItemLV.getChildAt(i);
+			l.setBackgroundColor(Color.parseColor("#ffffff"));
 
-//	private View searchLayout() {
-// 
-//		// LinearLayout.LayoutParams params = new
-//		// LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-//		// LayoutParams.WRAP_CONTENT);
-//		LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1.0f);
-//		// params.setLayoutDirection(layoutDirection);
-//
-//		LinearLayout search_line_layout = new LinearLayout(context);
-//		search_line_layout.setOrientation(LinearLayout.HORIZONTAL);
-//		search_line_layout.setWeightSum(1f);
-//		search_line_layout.setPadding(10, 10, 10, 10);
-//
-//		EditText keywords_view = new EditText(context);
-//		keywords_view.setHint("请输入搜索关键字");
-//		keywords_view.setLayoutParams(param);
-//		search_line_layout.addView(keywords_view);
-//
-//		Button search_button = new Button(context);
-//		search_button.setText("搜索");
-//		search_button.setBackgroundColor(Color.BLUE);
-//		search_button.setWidth(30);
-//		search_line_layout.addView(search_button);
-//
-//		LinearLayout search_history_layout = new LinearLayout(context);
-//		search_history_layout.setOrientation(LinearLayout.VERTICAL);
-//
-//		search_history_layout.addView(search_line_layout);
-//
-//		for (int i = 0; i < 3; i++) {
-//			TextView history = new TextView(context);
-//			history.setText("keywords:" + i);
-//			search_history_layout.addView(history);
-//		}
-//
-//		return search_history_layout;
-//	}
+			Button b = (Button) l.getChildAt(4);
+			b.setText("购买");
+			b.setTextColor(Color.parseColor("#ffffff"));
+			b.setBackgroundResource(R.drawable.buy_selector);
+			b.setClickable(true);
+		}
+	}
+
 }

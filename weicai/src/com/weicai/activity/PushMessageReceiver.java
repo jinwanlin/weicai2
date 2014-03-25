@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.baidu.android.pushservice.PushConstants;
 import com.weicai.bean.Order;
+import com.weicai.fragment.ProductFragment;
 
 /**
  * Push消息处理receiver
@@ -45,6 +46,9 @@ public class PushMessageReceiver extends BroadcastReceiver {
 				String state = json.getString("state");
 				ProductFragment.last_order_state = Order.State.valueOf(state.toUpperCase());
 				ProductFragment.changeOrderState();
+				ProductFragment.sss();
+
+//				TODO
 				Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
 			} catch (JSONException e) {
@@ -85,14 +89,18 @@ public class PushMessageReceiver extends BroadcastReceiver {
 			Log.d(TAG, "onMessage: content : " + content);
 			
 			try {
-				JSONObject userObj = new JSONObject(content);
-				JSONObject response_params = userObj.getJSONObject("response_params");
-//				String appid = response_params.getString("appid");
-//				String channel_id = response_params.getString("channel_id");
-				String user_id = response_params.getString("user_id");
-				
-//				CaiCai.update_baidu_user_id(user_id);
-				Log.i(TAG, "user_id: "+user_id);
+				if(errorCode > 0){
+					
+				}else{
+					JSONObject userObj = new JSONObject(content);
+					JSONObject response_params = userObj.getJSONObject("response_params");
+//					String appid = response_params.getString("appid");
+//					String channel_id = response_params.getString("channel_id");
+					String user_id = response_params.getString("user_id");
+					
+//					CaiCai.update_baidu_user_id(user_id);
+					Log.i(TAG, "user_id: "+user_id);
+				}
 						
 			} catch (JSONException e) {
 				e.printStackTrace();

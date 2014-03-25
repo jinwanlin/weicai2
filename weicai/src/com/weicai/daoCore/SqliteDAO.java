@@ -63,7 +63,7 @@ public class SqliteDAO{
     }
      
      
-    private <T> T insert(T entity,boolean selective){    
+    private <T> T insert(T entity,boolean selective){
         ContentValues values=getContentValues(entity,selective);
 		Log.i(tag, "insert id: "+ values.getAsInteger("id")+",  name:"+values.getAsString("name"));
         T exist_obj=this.loadByPrimaryKey(entity);

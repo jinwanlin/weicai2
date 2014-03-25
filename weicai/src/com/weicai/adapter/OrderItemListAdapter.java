@@ -12,8 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.weicai.R;
-import com.weicai.activity.OrderFragment;
 import com.weicai.bean.OrderItem;
+import com.weicai.fragment.OrderFragment;
 import com.weicai.util.tool.DoubleFormat;
 
 

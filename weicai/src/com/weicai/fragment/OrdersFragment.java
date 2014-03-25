@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import java.util.List;
 
@@ -17,6 +17,8 @@ import android.widget.RelativeLayout;
 
 import com.weicai.R;
 import com.weicai.activity.BaseActivity.NetTask;
+import com.weicai.activity.LoadingActivity;
+import com.weicai.activity.MainActivity;
 import com.weicai.adapter.OrderListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;

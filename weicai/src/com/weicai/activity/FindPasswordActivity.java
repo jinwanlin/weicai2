@@ -40,6 +40,7 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.find_password);
 		BaseActivity.baseActivity = this;
+		MyApplication.getInstance().addActivity(this);
 
 		userDao = UserDao.getInstance();
 
@@ -121,7 +122,7 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 		@Override
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
-	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
+	        intent.setClass(FindPasswordActivity.this, LoadingActivity.class);//跳转到加载界面
 	        startActivity(intent);	
 	        
 			String phone = phone_edit_text.getText().toString();
@@ -162,7 +163,7 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 		@Override
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
-	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
+	        intent.setClass(FindPasswordActivity.this, LoadingActivity.class);//跳转到加载界面
 	        startActivity(intent);	
 	        
 			String phone = phone_edit_text.getText().toString();

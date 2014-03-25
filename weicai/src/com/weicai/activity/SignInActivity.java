@@ -46,16 +46,17 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY, BaiduPushUtils.getMetaValue(SignInActivity.this, "api_key"));
 
 		userDao = UserDao.getInstance();
+		MyApplication.getInstance().addActivity(this);
 		BaseActivity.baseActivity = this;
 		
-		if(userDao.first()==null){
-			User user1 = new User();
-			user1.setId(3);
-			user1.setName("望湘园");
-			user1.setPhone("15810845422");
-			userDao.insert(user1);
-			new SyncSearchHistoryTask().execute(0);
-		}
+//		if(userDao.first()==null){
+//			User user1 = new User();
+//			user1.setId(3);
+//			user1.setName("望湘园");
+//			user1.setPhone("15810845422");
+//			userDao.insert(user1);
+//			new SyncSearchHistoryTask().execute(0);
+//		}
 
 	
 		User user = userDao.first();
@@ -142,18 +143,18 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 			JSONObject json = CaiCai.StringToJSONObject(result);
 
-			int status = -1;
+			boolean state = false;
 			String msg = "";
 			JSONObject userObj = null;
 			try {
-				status = json.getInt("status");
+				state = json.getBoolean("state");
 				msg = json.getString("message");
 				userObj = json.getJSONObject("user");
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 
-			if (status == 0) {
+			if (state) {
 
 				User user = User.jsonToUser(userObj);
 				userDao.insert(user);
@@ -260,9 +261,9 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 //				Toast.makeText(this, toastStr, Toast.LENGTH_LONG).show();
 			}
 			
-//			登陆
+//			登录
 		} else if (BaiduPushUtils.ACTION_LOGIN.equals(action)) {
-			Log.i(tag, "登陆");
+			Log.i(tag, "登录");
 			String accessToken = intent.getStringExtra(BaiduPushUtils.EXTRA_ACCESS_TOKEN);
 			PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_ACCESS_TOKEN, accessToken);
 //			isLogin = true;

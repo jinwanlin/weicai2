@@ -62,4 +62,20 @@ public class SearchHistoryDao extends SqliteDAO {
 		return keywords;
     }
     
+    public void updateKeyword(long id, String keyword){
+    	List<SearchHistory> searchHistorys = loadAll(SearchHistory.class, null);
+		for (int i = 0; i < searchHistorys.size(); i++) {
+			SearchHistory searchHistory = searchHistorys.get(i);
+			if(searchHistory.getKeywords().equals(keyword)){
+				delete(searchHistory);
+			}
+		}
+		
+		SearchHistory searchHistory = new SearchHistory();
+		searchHistory.setId(id);
+		searchHistory.setKeywords(keyword);
+		searchHistory = insert(searchHistory);
+    }
+    
+    
 }

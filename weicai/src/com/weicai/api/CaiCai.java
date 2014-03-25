@@ -20,7 +20,7 @@ public class CaiCai {
 	}
 
 	public static final String BASE_URL = "http://192.168.0.103:3000";
-//	 private static final String BASE_URL = "http://115.28.160.65";
+//	public static final String BASE_URL = "http://115.28.160.65";
 
 	/**
 	 * String 转 JSONObject

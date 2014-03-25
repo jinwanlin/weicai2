@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.weicai.R;
+import com.weicai.activity.MainActivity;
+import com.weicai.activity.MyApplication;
 import com.weicai.dao.UserDao;
 
 public class SettingFragment extends Fragment {

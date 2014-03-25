@@ -20,11 +20,10 @@ import android.widget.TextView;
 
 import com.weicai.R;
 import com.weicai.activity.MainActivity;
-import com.weicai.activity.ProductFragment;
 import com.weicai.activity.ShowImgActivity;
-import com.weicai.adapter.PaymentListAdapter.ViewHolder;
 import com.weicai.bean.Order;
 import com.weicai.bean.Product;
+import com.weicai.fragment.ProductFragment;
 import com.weicai.img.ImageDownLoader;
 import com.weicai.img.ImageDownLoader.onImageLoaderListener;
 import com.weicai.util.tool.DoubleFormat;
@@ -42,7 +41,7 @@ public class ProductListAdapter extends BaseAdapter {
 	// 得到一个LayoutInfalter对象用来导入布局
 	private LayoutInflater mInflater;
 
-	private List<Product> products;
+	public static List<Product> products;
 
 	/* 构造函数 */
 	public ProductListAdapter(Context context, List<Product> products) {
@@ -100,7 +99,6 @@ public class ProductListAdapter extends BaseAdapter {
 		holder.price = (TextView) convertView.findViewById(R.id.ItemPrice);
 		holder.price_unit = (TextView) convertView.findViewById(R.id.price_unit);
 		holder.bt = (Button) convertView.findViewById(R.id.ItemButton);
-		convertView.setTag(holder);// 绑定ViewHolder对象
 		convertView.setTag(holder);// 绑定ViewHolder对象
 	} else {
 		holder = (ViewHolder) convertView.getTag();// 取出ViewHolder对象
@@ -234,6 +232,13 @@ public class ProductListAdapter extends BaseAdapter {
 			mImageView.setImageBitmap(bitmap);
 		} else {
 			mImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_empty));
+		}
+	}
+	
+	public static void resetOrderAmount(){
+		for (int i = 0; i < products.size(); i++) {
+			Product product = products.get(i);
+			product.setOrderAmount(0);
 		}
 	}
 

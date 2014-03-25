@@ -3,29 +3,43 @@ package com.weicai.activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.weicai.R;
+import com.weicai.fragment.ChangePasswordFragment;
+import com.weicai.fragment.OrderFragment;
+import com.weicai.fragment.OrdersFragment;
+import com.weicai.fragment.PaymentsFragment;
+import com.weicai.fragment.ProductFragment;
+import com.weicai.fragment.RechargeFragment;
+import com.weicai.fragment.SearchFragment;
+import com.weicai.fragment.SettingFragment;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
 	static final String tag = "MainActivity";
 
 	public static SlidingMenu menu = null;
 
-	public ProductFragment productsFragment;
+	public ProductFragment productFragment;
 	public OrdersFragment ordersFragment;
 	public PaymentsFragment paymentsFragment;
 	public SettingFragment settingFragment;
 
+	public LinearLayout bottom_menu;
+	
 	private View productsLayout;
 	private View ordersLayout;
 	private View paymentsLayout;
@@ -46,6 +60,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	public RechargeFragment rechargeFragment;
 	public ChangePasswordFragment changePasswordFragment;
 	private Fragment lastFragment;
+	private SearchFragment searchFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +86,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		ordersLayout = findViewById(R.id.orders_layout);
 		paymentsLayout = findViewById(R.id.payments_layout);
 		settingLayout = findViewById(R.id.setting_layout);
+
+        bottom_menu = (LinearLayout) findViewById(R.id.bottom_menu);
 		productsImage = (ImageView) findViewById(R.id.products_image);
 		ordersImage = (ImageView) findViewById(R.id.orders_image);
 		paymentsImage = (ImageView) findViewById(R.id.payments_image);
@@ -138,17 +155,17 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			// 当点击了消息tab时，改变控件的图片和文字颜色
 			productsImage.setImageResource(R.drawable.homes_selected);
 			productsText.setTextColor(Color.WHITE);
-			if (productsFragment == null) {
+			if (productFragment == null) {
 				// 如果ProductsFragment为空，则创建一个并添加到界面上
-				productsFragment = new ProductFragment();
-				productsFragment.setContext(this);
-				transaction.add(R.id.content, productsFragment);
+				productFragment = new ProductFragment();
+				productFragment.setContext(this);
+				transaction.add(R.id.content, productFragment);
 			
 				// 加载菜单
-				productsFragment.showMenu(); 
+				productFragment.showMenu(); 
 			} else {
 				// 如果ProductsFragment不为空，则直接将它显示出来
-				transaction.show(productsFragment);
+				transaction.show(productFragment);
 			}
 			break;
 		case 1:
@@ -212,8 +229,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	 *            用于对Fragment执行操作的事务
 	 */
 	private void hideFragments(FragmentTransaction transaction) {
-		if (productsFragment != null) {
-			transaction.hide(productsFragment);
+		if (productFragment != null) {
+			transaction.hide(productFragment);
 		}
 		if (ordersFragment != null) {
 			transaction.hide(ordersFragment);
@@ -233,6 +250,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		if (rechargeFragment != null) {
 			transaction.hide(rechargeFragment);
 		}
+		if (searchFragment != null) {
+			transaction.hide(searchFragment);
+		}
+		
 
 	}
 
@@ -268,14 +289,59 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		hideFragments(transaction);
 
 		ChangePasswordFragment changePasswordFragment = new ChangePasswordFragment();
-		changePasswordFragment.setMainActivity(this);
+		changePasswordFragment.setContext(this);
 		this.changePasswordFragment = changePasswordFragment;
 		this.lastFragment = settingFragment;
 
 		transaction.add(R.id.content, changePasswordFragment);
 		transaction.commit();
 	}
+	
 
+	public void showSearch() {
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		hideFragments(transaction);
+
+		searchFragment = new SearchFragment();
+		searchFragment.setContext(this);
+
+		transaction.add(R.id.content, searchFragment);
+		transaction.commit();
+
+		bottom_menu.setVisibility(View.GONE);
+		menu.setSlidingEnabled(false);
+	}
+	
+	public void searchCancel() {
+		bottom_menu.setVisibility(View.VISIBLE);
+		
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		hideFragments(transaction);
+		
+		transaction.show(productFragment);
+		transaction.commit();
+		
+		menu.setSlidingEnabled(true);
+	}
+	
+	public void searchProduct(String type, String classify, String searchKey) {
+		bottom_menu.setVisibility(View.VISIBLE);
+		
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		hideFragments(transaction);
+
+		productFragment = new ProductFragment();
+		productFragment.type = type;
+		productFragment.classify = classify;
+		productFragment.searchKey = searchKey;
+		productFragment.setContext(this);
+		
+		transaction.add(R.id.content, productFragment);
+		transaction.commit();
+		
+		menu.setSlidingEnabled(true);
+	}
+	
 	/** 后退一步 */
 	public void back() {
 		if (lastFragment != null) {

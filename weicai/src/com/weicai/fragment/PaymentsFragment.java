@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import java.util.List;
 
@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import com.weicai.R;
 import com.weicai.activity.BaseActivity.NetTask;
+import com.weicai.activity.LoadingActivity;
+import com.weicai.activity.MainActivity;
 import com.weicai.adapter.PaymentListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.PaymentAPI;
@@ -27,7 +29,6 @@ import com.weicai.util.tool.DoubleFormat;
 public class PaymentsFragment extends Fragment {
 
 	private TextView overage;
-//	private TableLayout table;
 	private MainActivity mainActivity;
 	private LinearLayout basic_info_layout;
 	private RelativeLayout no_values_layout;
@@ -56,7 +57,6 @@ public class PaymentsFragment extends Fragment {
 		paymentListLV = (ListView) layout.findViewById(R.id.paymentListLV);
 
 
-//		table = (TableLayout) layout.findViewById(R.id.table);
 
 		new RefreshPaymentsTask().execute(0);
 		return layout;
@@ -85,8 +85,7 @@ public class PaymentsFragment extends Fragment {
 			
 			JSONArray json = CaiCai.StringToJSONArray(result);
 			List<Payment> payments = Payment.jsonToList(json);
-//			showPayments(payments);
-			
+
 			// 显示余额
 			if (payments.size() > 0) {
 				Payment payment = payments.get(0);

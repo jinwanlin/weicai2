@@ -79,7 +79,7 @@ public class UserAPI extends CaiCai {
 	}
 
 	/**
-	 * 登陆
+	 * 登录
 	 * 
 	 * @param phone
 	 * @param password

@@ -12,6 +12,7 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/bottom_menu"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/tab_bg" >

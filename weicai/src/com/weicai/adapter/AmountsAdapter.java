@@ -15,11 +15,11 @@ import android.widget.TextView;
 
 import com.weicai.R;
 import com.weicai.activity.BaseActivity.NetTask;
-import com.weicai.activity.ProductFragment;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;
 import com.weicai.bean.Order;
 import com.weicai.bean.Product;
+import com.weicai.fragment.ProductFragment;
 
 public class AmountsAdapter extends BaseAdapter {
 
@@ -27,9 +27,6 @@ public class AmountsAdapter extends BaseAdapter {
 
 	// 得到一个LayoutInfalter对象用来导入布局
 	private LayoutInflater mInflater;
-	// private String[] amounts;
-	// private int bought;
-	// private String unit;
 	private Product product;
 	private com.weicai.adapter.ProductListAdapter.ViewHolder holder3;
 
@@ -79,24 +76,8 @@ public class AmountsAdapter extends BaseAdapter {
 				ProductListAdapter.dialog.cancel();
 
 				product.setOrderAmount(Integer.parseInt(amount));
-
 				
-				
-				
-//				int color = Color.WHITE;
-//				String buttonText = "购买";
-//				if (!amount.equals("0")) {
-//					buttonText = amount + product.getUnit();
-////					color = Color.CYAN;
-//					color = Color.parseColor("#CCFFCC");
-//				}
-//				holder3.product_view.setBackgroundColor(color);
-//				holder3.bt.setBackgroundColor(color);
-//				holder3.bt.setText(buttonText);
-				
-				
-				
-//				已购买
+				//已购买
 				if (!amount.equals("0")){
 					holder3.product_view.setBackgroundColor(Color.parseColor("#CCFFCC"));
 					
@@ -111,10 +92,6 @@ public class AmountsAdapter extends BaseAdapter {
 					holder3.bt.setText("购买");
 				}
 				
-				
-
-//				Log.i(tag, "buttonText====" + buttonText);
-
 				new OrderTask(product.getId() + "", amount + "").execute(0);
 
 			}

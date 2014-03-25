@@ -8,14 +8,17 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/leba_bg_top_selector"
-        android:padding="5dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:padding="5dp" >
 
-        <ImageButton
-             android:id="@+id/icon"
+        <ImageView
+            android:id="@+id/icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            />
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical|center"
+            android:padding="3dp" />
+
         <TextView
             android:id="@+id/classify"
             android:layout_width="0dip"
@@ -26,9 +29,11 @@
             android:textSize="18sp" />
     </LinearLayout>
 
-<!--     <TextView
+    <!--
+         <TextView
         android:layout_width="match_parent"
         android:layout_height="0.8dip"
-        android:background="#aaa" /> -->
+        android:background="#aaa" />
+    -->
 
 </LinearLayout>

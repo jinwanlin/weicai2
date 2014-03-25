@@ -19,7 +19,7 @@ public class HttpUtils {
 
 
 	public static String doGet(String url) {
-		Log.v("url", url);
+		Log.i("get url", url);
 //		Log.v("url", "get:address-->" + url);
 		HttpGet request = new HttpGet(url);
 		try {
@@ -44,13 +44,14 @@ public class HttpUtils {
 	// map.put("k2", "v2");
 	// map.put("k3", "v3");
 	public static String doPost(String url, Map<String, String> map) {
-		Log.v("url", url);
+		Log.i("post url", url);
 		// BasicNameValuePair pair = new BasicNameValuePair(String name,String
 		// value);//创建一个请求头的字段，比如content-type,text/plain
 
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		if (map != null && map.size() > 0) {
 			for (Map.Entry<String, String> entry : map.entrySet()) {
+				Log.i("post params", entry.getKey()+"="+entry.getValue());
 				NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue());
 				list.add(pair);
 			}

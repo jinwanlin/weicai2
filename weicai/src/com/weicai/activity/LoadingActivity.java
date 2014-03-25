@@ -47,7 +47,7 @@ public class LoadingActivity extends Activity implements OnClickListener {
 		// 并且Handler中post方法既可以执行耗时事件也可以做一些UI更新的事情，比较好用，推荐使用
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
-				// 等待10000毫秒后销毁此页面，并提示登陆成功
+				// 等待10000毫秒后销毁此页面，并提示登录成功
 				// if (BaseActivity.loadingActivity != null){
 				// BaseActivity.loadingActivity.finish();
 				// BaseActivity.loadingActivity = null;

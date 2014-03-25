@@ -1,4 +1,4 @@
-package com.weicai.activity;
+package com.weicai.fragment;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -14,6 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.weicai.R;
+import com.weicai.activity.BaseActivity;
+import com.weicai.activity.LoadingActivity;
+import com.weicai.activity.MainActivity;
 import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.api.PaymentAPI;
 

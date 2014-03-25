@@ -54,6 +54,8 @@ public abstract class BaseActivity extends FragmentActivity {
 				BaseActivity.loadingActivity = null;
 			}
 			
+			Log.i(tag, "----------super clear");
+			
 			if (result == null || result.equals("")) {
 				if (!netStateUtils.isNetConnected()) {
 					new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("无法访问网络，请检查WIFI和3G是否打开！").setPositiveButton("确定", null).show();// show很关键

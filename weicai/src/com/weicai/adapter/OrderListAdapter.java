@@ -12,8 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.weicai.R;
-import com.weicai.activity.OrdersFragment;
 import com.weicai.bean.Order;
+import com.weicai.fragment.OrdersFragment;
 import com.weicai.util.tool.DoubleFormat;
 import com.weicai.util.tool.TodayYestorday;
 
