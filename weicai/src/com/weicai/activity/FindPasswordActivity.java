@@ -4,16 +4,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.weicai.R;
 import com.weicai.api.CaiCai;
@@ -26,11 +31,13 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 	static final String tag = "FindPasswordActivity";
 	
 	private EditText phone_edit_text, validate_code_edit_text, new_password_edit_text;
-	private TextView phone_text_view, message;
-	private Button next_validate, resend_validate_code, change_phone, next_set_password, update_password_button;
+	private TextView phone_text_view;
+	private Button next_validate, resend_validate_code, next_set_password, update_password_button;
 	private LinearLayout find_password_ly1, find_password_ly2, find_password_ly3;
 	private UserDao userDao;
 	private String validateCode;
+	private ImageButton back;
+	private int step = 1;
 
 
 	@SuppressLint("NewApi")
@@ -44,18 +51,18 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 
 		userDao = UserDao.getInstance();
 
-		message = (TextView) findViewById(R.id.message);
+		back = (ImageButton) findViewById(R.id.back);
+		back.setOnClickListener(this);
 		
 		find_password_ly1 = (LinearLayout)findViewById(R.id.find_password_ly1);
 		phone_edit_text = (EditText) findViewById(R.id.phone_edit_text);
 		phone_edit_text.setText(new SIMCardInfo(FindPasswordActivity.this).getNativePhoneNumber().replace("+86", ""));
 		next_validate = (Button) findViewById(R.id.next_validate);
 		next_validate.setOnClickListener(this);
-		
+		phone_edit_text.requestFocus();
+
 		find_password_ly2 = (LinearLayout)findViewById(R.id.find_password_ly2);
 		phone_text_view = (TextView) findViewById(R.id.phone_text_view);
-		change_phone = (Button) findViewById(R.id.change_phone);
-		change_phone.setOnClickListener(this);
 		validate_code_edit_text = (EditText) findViewById(R.id.validate_code_edit_text);
 		resend_validate_code = (Button) findViewById(R.id.resend_validate_code);
 		resend_validate_code.setOnClickListener(this);
@@ -66,51 +73,49 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 		new_password_edit_text = (EditText) findViewById(R.id.new_password_edit_text);
 		update_password_button = (Button) findViewById(R.id.update_password_button);
 		update_password_button.setOnClickListener(this);
-		
-		findViewById(R.id.sign_in).setOnClickListener(this);
-		findViewById(R.id.sign_up).setOnClickListener(this);
 	}
 
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.next_validate:
-			new SendValidateCodeTask().execute(0);
+		case R.id.back:
+			back();
 			break;
-			
-		case R.id.change_phone:
-			find_password_ly1.setVisibility(View.VISIBLE);
-			find_password_ly2.setVisibility(View.GONE);
+		case R.id.next_validate:
+			step++;
+			Log.i(tag, step+"");
+			new SendValidateCodeTask().execute(0);
 			break;
 		case R.id.resend_validate_code:
 			new SendValidateCodeTask().execute(0);
 			break;
 		case R.id.next_set_password:
-			if (validate_code_edit_text.getText().toString().equals(validateCode)){
+			step++;
+			String validate_code = validate_code_edit_text.getText().toString();
+			if (validate_code!=null && !validate_code.equals("") && validate_code.equals(validateCode)) {
 				find_password_ly2.setVisibility(View.GONE);
 				find_password_ly3.setVisibility(View.VISIBLE);
 			}else{
-				message.setText("验证码错误");
+				new AlertDialog.Builder(FindPasswordActivity.this).setMessage("验证码错误").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						validate_code_edit_text.requestFocus();
+					}
+				}).show();
 			}
 			break;
-			
 		case R.id.update_password_button:
-			new UpdatePassword().execute(0);
-			break;
-		case R.id.sign_in:
-			Intent intent = new Intent();
-			intent.setClass(this, SignInActivity.class);
-			startActivity(intent);
-			finish();
-			break;
-		case R.id.sign_up:
-			Intent intent2 = new Intent();
-			intent2.setClass(this, SignUpActivity.class);
-			startActivity(intent2);
-			finish();
-			break;
-		default:
+			String new_password = new_password_edit_text.getText().toString();
+
+			if (new_password!=null && !new_password.equals("")) {
+				new UpdatePassword().execute(0);
+			}else{
+				new AlertDialog.Builder(FindPasswordActivity.this).setMessage("请输入密码").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						new_password_edit_text.requestFocus();
+					}
+				}).show();
+			}
 			break;
 		}
 	}
@@ -118,7 +123,6 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 	
 		
 	class SendValidateCodeTask extends NetTask {
-
 		@Override
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
@@ -126,7 +130,7 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 	        startActivity(intent);	
 	        
 			String phone = phone_edit_text.getText().toString();
-			return UserAPI.send_validate_code(phone);
+			return UserAPI.send_validate_code(phone, validateCode);
 		}
 
 		@Override
@@ -148,9 +152,9 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 					find_password_ly1.setVisibility(View.GONE);
 					find_password_ly2.setVisibility(View.VISIBLE);
 				}
-				message.setText(json.getString("message"));
+				new AlertDialog.Builder(FindPasswordActivity.this).setMessage(json.getString("message")).setPositiveButton("确定", null).show();
 			} catch (JSONException e) {
-				message.setText("验证码发送失败");
+				new AlertDialog.Builder(FindPasswordActivity.this).setMessage("验证码发送失败").setPositiveButton("确定", null).show();
 				e.printStackTrace();
 			}
 
@@ -194,12 +198,40 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 					finish();// 停止当前的Activity,如果不写,则按返回键会跳转回原来的Activity
 				}
 			} catch (JSONException e) {
-				message.setText("验证码发送失败");
+				new AlertDialog.Builder(FindPasswordActivity.this).setMessage("密码修改失败").setPositiveButton("确定", null).show();
 				e.printStackTrace();
 			}
 
 		}
 
+	}
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			back();
+			return false;
+		}else{
+			return super.onKeyDown(keyCode, event);
+		}
+	}
+	
+	private void back(){
+		Log.i(tag, step+"--");
+		switch (step) {
+		case 1:
+			finish();
+			break;
+		case 2:
+			find_password_ly2.setVisibility(View.GONE);
+			find_password_ly1.setVisibility(View.VISIBLE);
+			break;
+		case 3:
+			find_password_ly3.setVisibility(View.GONE);
+			find_password_ly2.setVisibility(View.VISIBLE);
+			break;
+		}
+
+		step--;
 	}
 	
 	

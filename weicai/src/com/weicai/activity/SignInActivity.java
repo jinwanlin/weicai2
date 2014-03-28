@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -32,7 +33,6 @@ import com.weicai.util.tool.SIMCardInfo;
 public class SignInActivity extends BaseActivity implements OnClickListener {
 	static final String tag = "SignInActivity";
 	private EditText userNameText, passwordText;
-	private TextView message;
 	private UserDao userDao;
 //	private boolean isLogin = false;
 
@@ -71,7 +71,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		}
 
 		setContentView(R.layout.sign_in);
-		message = (TextView) findViewById(R.id.message);
 
 		userNameText = (EditText) findViewById(R.id.phone_number);
 		userNameText.setText(new SIMCardInfo(SignInActivity.this).getNativePhoneNumber().replace("+86", ""));
@@ -105,8 +104,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 			new SignInTask().execute(0);
 			break;
 		case R.id.validate_and_sign_up:
-			break;
-		case R.id.change_phone:
 			break;
 		case R.id.resend_validate_code:
 			break;
@@ -174,7 +171,11 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 				finish();// 停止当前的Activity,如果不写,则按返回键会跳转回原来的Activity
 
 			} else {
-				message.setText(msg);
+				new AlertDialog.Builder(SignInActivity.this).setMessage(msg).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						passwordText.requestFocus();
+					}
+				}).show();
 			}
 		}
 

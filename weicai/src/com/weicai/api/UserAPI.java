@@ -39,10 +39,13 @@ public class UserAPI extends CaiCai {
 		return HttpUtils.doPost(url, map);
 	}
 	
-	public static String send_validate_code(String phone) {
+	public static String send_validate_code(String phone, String validate_code) {
 		String url = BASE_URL + "/api/v2/users/send_validate_code";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[phone]", phone);
+		if (validate_code != null && !validate_code.equals("")) {
+			map.put("validate_code", validate_code);
+		}
 		return HttpUtils.doPost(url, map);
 	}
 	

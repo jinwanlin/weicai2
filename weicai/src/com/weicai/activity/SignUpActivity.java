@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -34,8 +35,9 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 	public boolean hasValidateCode = false;
 	private UserDao userDao;
 	private String validateCode;
-	private ImageButton back, change_phone;
-
+	private ImageButton back;
+	private int step = 1;
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,20 +85,14 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 		
 		back = (ImageButton)findViewById(R.id.back);
 		back.setOnClickListener(this);
-		change_phone = (ImageButton)findViewById(R.id.change_phone);
-		change_phone.setOnClickListener(this);
 		
-		
-		
-//		findViewById(R.id.sign_in).setOnClickListener(this);
-//		findViewById(R.id.find_password).setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.back:
-			finish();
+			back();
 			break;
 		case R.id.next_or_sign_up:
 			String userName = phone_edit_text.getText().toString();
@@ -129,18 +125,8 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 				}).show();
 			}
 			break;
-		case R.id.change_phone:
-			sign_up_ly.setVisibility(View.VISIBLE);
-			validate_ly.setVisibility(View.GONE);
-
-			change_phone.setVisibility(View.GONE);
-			back.setVisibility(View.VISIBLE);
-			
-			break;
 		case R.id.resend_validate_code:
 			new GetValidateCodeTask().execute(0);
-			break;
-		default:
 			break;
 		}
 	}
@@ -267,21 +253,43 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 					phone_text_view.setText(sb.toString());
 					sign_up_ly.setVisibility(View.GONE);
 					validate_ly.setVisibility(View.VISIBLE);
-					back.setVisibility(View.GONE);
-					change_phone.setVisibility(View.VISIBLE);
-					
+
 					validate_code_text.requestFocus();
+					step++;
 				}
 				new AlertDialog.Builder(SignUpActivity.this).setMessage(json.getString("message")).setPositiveButton("确定", null).show();// show很关键
 			} catch (JSONException e) {
 //				message.setText("验证码发送失败");
-				new AlertDialog.Builder(SignUpActivity.this).setMessage("验证码发送失败").setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-					}
-				}).show();
+				new AlertDialog.Builder(SignUpActivity.this).setMessage("验证码发送失败").setPositiveButton("确定", null).show();
 				e.printStackTrace();
 			}
 		}
-
 	}
+	
+	
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			back();
+			return false;
+		}else{
+			return super.onKeyDown(keyCode, event);
+		}
+	}
+	
+	private void back(){
+		Log.i(tag, step+"--");
+		switch (step) {
+		case 1:
+			finish();
+			break;
+		case 2:
+			sign_up_ly.setVisibility(View.VISIBLE);
+			validate_ly.setVisibility(View.GONE);
+			break;
+		}
+
+		step--;
+	}
+	
 }
