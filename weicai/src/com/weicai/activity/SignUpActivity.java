@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,16 +25,16 @@ import com.weicai.bean.User;
 import com.weicai.dao.UserDao;
 import com.weicai.util.tool.SIMCardInfo;
 
-public class SignUpActivity extends BaseActivity implements OnClickListener{
+public class SignUpActivity extends BaseActivity implements OnClickListener {
 	static final String tag = "SignUpActivity";
 	private EditText phone_edit_text, password_edit_text;
-	private TextView phone_text_view, validate_code_text, message;
+	private TextView phone_text_view, validate_code_text;
 	private Button validate_and_sign_up, next_or_sign_up, resend_validate_code;
 	private LinearLayout sign_up_ly, validate_ly;
 	public boolean hasValidateCode = false;
 	private UserDao userDao;
 	private String validateCode;
-
+	private ImageButton back, change_phone;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -43,45 +46,51 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 		BaseActivity.baseActivity = this;
 
 		userDao = UserDao.getInstance();
-		
-//		是否需要验证码
+
+		// 是否需要验证码
 		new HasValidateCodeTask().execute(0);
 
-		sign_up_ly = (LinearLayout)findViewById(R.id.sign_up_ly);
-		validate_ly = (LinearLayout)findViewById(R.id.validate_ly);
-		
+		sign_up_ly = (LinearLayout) findViewById(R.id.sign_up_ly);
+		validate_ly = (LinearLayout) findViewById(R.id.validate_ly);
+
 		phone_edit_text = (EditText) findViewById(R.id.phone_edit_text);
 		phone_edit_text.setText(new SIMCardInfo(SignUpActivity.this).getNativePhoneNumber().replace("+86", ""));
 		password_edit_text = (EditText) findViewById(R.id.password_edit_text);
+		String userName = phone_edit_text.getText().toString();
 
+		if(userName!=null && !userName.equals("")){
+			password_edit_text.requestFocus();
+		}else{
+			phone_edit_text.requestFocus();
+		}
+		
+		
 		phone_text_view = (TextView) findViewById(R.id.phone_text_view);
 		validate_code_text = (TextView) findViewById(R.id.validate_code_text);
-		
 
-		message = (TextView) findViewById(R.id.message);
-		
-//		返回上个activity
-//		findViewById(R.id.back).setOnClickListener(this);
-		
-//		下一步 或 注册
-		next_or_sign_up = (Button)findViewById(R.id.next_or_sign_up);
+		// 下一步 或 注册
+		next_or_sign_up = (Button) findViewById(R.id.next_or_sign_up);
 		next_or_sign_up.setOnClickListener(this);
-		
-//		注册
-		validate_and_sign_up = (Button)findViewById(R.id.validate_and_sign_up);
+
+		// 注册
+		validate_and_sign_up = (Button) findViewById(R.id.validate_and_sign_up);
 		validate_and_sign_up.setOnClickListener(this);
-		
 
-		
-//		从新发送验证码
-		resend_validate_code = (Button)findViewById(R.id.resend_validate_code);
+		// 从新发送验证码
+		resend_validate_code = (Button) findViewById(R.id.resend_validate_code);
 		resend_validate_code.setOnClickListener(this);
-//		更换手机号
-		findViewById(R.id.change_phone).setOnClickListener(this);		
-		findViewById(R.id.sign_in).setOnClickListener(this);
-		findViewById(R.id.find_password).setOnClickListener(this);
+		// 更换手机号
+		
+		back = (ImageButton)findViewById(R.id.back);
+		back.setOnClickListener(this);
+		change_phone = (ImageButton)findViewById(R.id.change_phone);
+		change_phone.setOnClickListener(this);
+		
+		
+		
+//		findViewById(R.id.sign_in).setOnClickListener(this);
+//		findViewById(R.id.find_password).setOnClickListener(this);
 	}
-
 
 	@Override
 	public void onClick(View v) {
@@ -90,69 +99,60 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 			finish();
 			break;
 		case R.id.next_or_sign_up:
-			if (hasValidateCode) {
-				phone_text_view.setText(phone_edit_text.getText().toString());
-				sign_up_ly.setVisibility(View.GONE);
-				validate_ly.setVisibility(View.VISIBLE);
-				new GetValidateCodeTask().execute(0);
-			} else {
-				phone_edit_text.getText().toString();
-				new SignUpTask().execute(0);
+			String userName = phone_edit_text.getText().toString();
+			String password = password_edit_text.getText().toString();
+			if(userName==null || userName.equals("")){
+				new AlertDialog.Builder(SignUpActivity.this).setMessage("请输入手机号").setPositiveButton("确定", null).show();// show很关键
+			}else if(password==null || password.equals("")){
+				new AlertDialog.Builder(SignUpActivity.this).setMessage("请输入密码").setPositiveButton("确定", null).show();// show很关键
+			}else{
+				if (hasValidateCode) {
+					new GetValidateCodeTask().execute(0);
+				} else {
+
+					Log.i(tag, "------+-----");
+					new SignUpTask().execute(0);
+				}
 			}
 			break;
 		case R.id.validate_and_sign_up:
-			if (validate_code_text.getText().toString().equals(validateCode)){
+			String validate_code = validate_code_text.getText().toString();
+			
+			if (validate_code!=null && !validate_code.equals("") && validate_code.equals(validateCode)) {
 				new SignUpTask().execute(0);
-			}else{
+			} else {
 				Log.i(tag, "validate_code not eques");
-				message.setText("验证码错误");
+				new AlertDialog.Builder(SignUpActivity.this).setMessage("验证码错误").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						validate_code_text.requestFocus();
+					}
+				}).show();
 			}
 			break;
 		case R.id.change_phone:
 			sign_up_ly.setVisibility(View.VISIBLE);
 			validate_ly.setVisibility(View.GONE);
+
+			change_phone.setVisibility(View.GONE);
+			back.setVisibility(View.VISIBLE);
+			
 			break;
 		case R.id.resend_validate_code:
 			new GetValidateCodeTask().execute(0);
 			break;
-		case R.id.sign_in:
-			Intent intent = new Intent();
-			intent.setClass(this, SignInActivity.class);
-			startActivity(intent);
-			break;
-		case R.id.find_password:
-			Intent intent2 = new Intent();
-			intent2.setClass(this, FindPasswordActivity.class);
-			startActivity(intent2);
-			break;
-			
-			
 		default:
 			break;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	class SignUpTask extends NetTask {
 		@Override
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
 			intent.putExtra("loading_text", "注册中...");
-	        intent.setClass(SignUpActivity.this, LoadingActivity.class);//跳转到加载界面
-	        startActivity(intent);	
-	        
+			intent.setClass(SignUpActivity.this, LoadingActivity.class);// 跳转到加载界面
+			startActivity(intent);
+
 			String userName = phone_edit_text.getText().toString();
 			String password = password_edit_text.getText().toString();
 			return UserAPI.sign_up(userName, password);
@@ -164,7 +164,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 			if (result.equals("")) {
 				return;
 			}
-			
+
 			JSONObject json = CaiCai.StringToJSONObject(result);
 
 			boolean state = false;
@@ -194,20 +194,15 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 		}
 
 	}
-	
-	
-	
-	
-	
-	
+
 	class HasValidateCodeTask extends NetTask {
 
 		@Override
 		protected String doInBackground(Integer... params) {
-//			Intent intent = new Intent();
-//	        intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
-//	        startActivity(intent);	
-	        
+			// Intent intent = new Intent();
+			// intent.setClass(mainActivity, LoadingActivity.class);//跳转到加载界面
+			// startActivity(intent);
+
 			return UserAPI.has_validate_code();
 		}
 
@@ -217,11 +212,10 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 			if (result.equals("")) {
 				return;
 			}
-				
-			
+
 			Log.i("aa--", result);
 			JSONObject json = CaiCai.StringToJSONObject(result);
-			
+
 			try {
 				hasValidateCode = json.getBoolean("has_validate_code");
 			} catch (JSONException e) {
@@ -236,21 +230,21 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 		}
 
 	}
-	
+
 	class GetValidateCodeTask extends NetTask {
 
 		@Override
 		protected String doInBackground(Integer... params) {
 			try {
 				Intent intent = new Intent();
-				intent.setClass(SignUpActivity.this, LoadingActivity.class);//跳转到加载界面
+				intent.setClass(SignUpActivity.this, LoadingActivity.class);// 跳转到加载界面
 				startActivity(intent);
 			} catch (Exception e) {
 				e.printStackTrace();
-			}	
-	        
+			}
+
 			String userName = phone_edit_text.getText().toString();
-			return UserAPI.get_sign_up_validate_code(userName);
+			return UserAPI.get_sign_up_validate_code(userName, validateCode);
 		}
 
 		@Override
@@ -259,18 +253,32 @@ public class SignUpActivity extends BaseActivity implements OnClickListener{
 			if (result == null || result.equals("")) {
 				return;
 			}
-				
-			
+
 			Log.i("aa--", result);
 			JSONObject json = CaiCai.StringToJSONObject(result);
-			
+
 			try {
-				if(json.getBoolean("state")){
+				if (json.getBoolean("state")) {
 					validateCode = json.getString("validate_code");
+					
+					String phone = phone_edit_text.getText().toString();
+					StringBuilder sb = new StringBuilder();
+					sb.append(phone).insert(3, " ").insert(8, " ");
+					phone_text_view.setText(sb.toString());
+					sign_up_ly.setVisibility(View.GONE);
+					validate_ly.setVisibility(View.VISIBLE);
+					back.setVisibility(View.GONE);
+					change_phone.setVisibility(View.VISIBLE);
+					
+					validate_code_text.requestFocus();
 				}
-				message.setText(json.getString("message"));
+				new AlertDialog.Builder(SignUpActivity.this).setMessage(json.getString("message")).setPositiveButton("确定", null).show();// show很关键
 			} catch (JSONException e) {
-				message.setText("验证码发送失败");
+//				message.setText("验证码发送失败");
+				new AlertDialog.Builder(SignUpActivity.this).setMessage("验证码发送失败").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				}).show();
 				e.printStackTrace();
 			}
 		}

@@ -75,9 +75,14 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 		userNameText = (EditText) findViewById(R.id.phone_number);
 		userNameText.setText(new SIMCardInfo(SignInActivity.this).getNativePhoneNumber().replace("+86", ""));
-
 		passwordText = (EditText) findViewById(R.id.password_edit_text);
 
+		if(userNameText!=null && !userNameText.equals("")){
+			passwordText.requestFocus();
+		}else{
+			userNameText.requestFocus();
+		}
+		 
 		findViewById(R.id.sign_in).setOnClickListener(this);
 		findViewById(R.id.sign_up).setOnClickListener(this);
 		findViewById(R.id.find_password).setOnClickListener(this);
