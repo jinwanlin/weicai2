@@ -56,8 +56,11 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 		validate_ly = (LinearLayout) findViewById(R.id.validate_ly);
 
 		phone_edit_text = (EditText) findViewById(R.id.phone_edit_text);
+		phone_edit_text.addTextChangedListener(new PhoneTextWatcher(phone_edit_text));
 		phone_edit_text.setText(new SIMCardInfo(SignUpActivity.this).getNativePhoneNumber().replace("+86", ""));
+
 		password_edit_text = (EditText) findViewById(R.id.password_edit_text);
+		
 		String userName = phone_edit_text.getText().toString();
 
 		if(userName!=null && !userName.equals("")){
@@ -68,6 +71,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 		
 		
 		phone_text_view = (TextView) findViewById(R.id.phone_text_view);
+
 		validate_code_text = (TextView) findViewById(R.id.validate_code_text);
 
 		// 下一步 或 注册
@@ -139,7 +143,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 			intent.setClass(SignUpActivity.this, LoadingActivity.class);// 跳转到加载界面
 			startActivity(intent);
 
-			String userName = phone_edit_text.getText().toString();
+			String userName = phone_edit_text.getText().toString().replace(" ", "");
 			String password = password_edit_text.getText().toString();
 			return UserAPI.sign_up(userName, password);
 		}
@@ -229,7 +233,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 				e.printStackTrace();
 			}
 
-			String userName = phone_edit_text.getText().toString();
+			String userName = phone_edit_text.getText().toString().replace(" ", "");
 			return UserAPI.get_sign_up_validate_code(userName, validateCode);
 		}
 
@@ -248,9 +252,7 @@ public class SignUpActivity extends BaseActivity implements OnClickListener {
 					validateCode = json.getString("validate_code");
 					
 					String phone = phone_edit_text.getText().toString();
-					StringBuilder sb = new StringBuilder();
-					sb.append(phone).insert(3, " ").insert(8, " ");
-					phone_text_view.setText(sb.toString());
+					phone_text_view.setText(phone);
 					sign_up_ly.setVisibility(View.GONE);
 					validate_ly.setVisibility(View.VISIBLE);
 

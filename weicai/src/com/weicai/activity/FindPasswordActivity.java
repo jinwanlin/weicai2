@@ -56,7 +56,9 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 		
 		find_password_ly1 = (LinearLayout)findViewById(R.id.find_password_ly1);
 		phone_edit_text = (EditText) findViewById(R.id.phone_edit_text);
+		phone_edit_text.addTextChangedListener(new PhoneTextWatcher(phone_edit_text));
 		phone_edit_text.setText(new SIMCardInfo(FindPasswordActivity.this).getNativePhoneNumber().replace("+86", ""));
+
 		next_validate = (Button) findViewById(R.id.next_validate);
 		next_validate.setOnClickListener(this);
 		phone_edit_text.requestFocus();
@@ -129,7 +131,7 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 	        intent.setClass(FindPasswordActivity.this, LoadingActivity.class);//跳转到加载界面
 	        startActivity(intent);	
 	        
-			String phone = phone_edit_text.getText().toString();
+			String phone = phone_edit_text.getText().toString().replace(" ", "");
 			return UserAPI.send_validate_code(phone, validateCode);
 		}
 
@@ -170,7 +172,7 @@ public class FindPasswordActivity extends BaseActivity implements OnClickListene
 	        intent.setClass(FindPasswordActivity.this, LoadingActivity.class);//跳转到加载界面
 	        startActivity(intent);	
 	        
-			String phone = phone_edit_text.getText().toString();
+			String phone = phone_edit_text.getText().toString().replace(" ", "");
 			String password = new_password_edit_text.getText().toString();
 			return UserAPI.update_password(phone, password);
 		}

@@ -12,12 +12,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
@@ -32,9 +34,11 @@ import com.weicai.util.tool.SIMCardInfo;
 
 public class SignInActivity extends BaseActivity implements OnClickListener {
 	static final String tag = "SignInActivity";
-	private EditText userNameText, passwordText;
+	private EditText passwordText;
+	private EditText userNameText;
 	private UserDao userDao;
-//	private boolean isLogin = false;
+
+	// private boolean isLogin = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -48,20 +52,18 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		userDao = UserDao.getInstance();
 		MyApplication.getInstance().addActivity(this);
 		BaseActivity.baseActivity = this;
-		
-//		if(userDao.first()==null){
-//			User user1 = new User();
-//			user1.setId(3);
-//			user1.setName("望湘园");
-//			user1.setPhone("15810845422");
-//			userDao.insert(user1);
-//			new SyncSearchHistoryTask().execute(0);
-//		}
 
-	
+		// if(userDao.first()==null){
+		// User user1 = new User();
+		// user1.setId(3);
+		// user1.setName("望湘园");
+		// user1.setPhone("15810845422");
+		// userDao.insert(user1);
+		// new SyncSearchHistoryTask().execute(0);
+		// }
+
 		User user = userDao.first();
 		if (user != null) { // 已登录，跳转到首页
-
 
 			Intent intent = new Intent();
 			intent.setClass(SignInActivity.this, MainActivity.class);
@@ -73,24 +75,27 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		setContentView(R.layout.sign_in);
 
 		userNameText = (EditText) findViewById(R.id.phone_number);
+		userNameText.addTextChangedListener(new PhoneTextWatcher(userNameText));
+
 		userNameText.setText(new SIMCardInfo(SignInActivity.this).getNativePhoneNumber().replace("+86", ""));
 		passwordText = (EditText) findViewById(R.id.password_edit_text);
 
-		if(userNameText!=null && !userNameText.equals("")){
+		if (userNameText != null && !userNameText.equals("")) {
 			passwordText.requestFocus();
-		}else{
+		} else {
 			userNameText.requestFocus();
 		}
-		 
+
 		findViewById(R.id.sign_in).setOnClickListener(this);
 		findViewById(R.id.sign_up).setOnClickListener(this);
 		findViewById(R.id.find_password).setOnClickListener(this);
-		
+
 		if (!netStateUtils.isNetConnected()) {
 			new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("无法访问网络，请检查WIFI和3G是否打开！").setPositiveButton("确定", null).show();// show很关键
 		}
 	}
-	
+
+
 
 	@Override
 	public void onClick(View v) {
@@ -128,10 +133,10 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		@Override
 		protected String doInBackground(Integer... params) {
 			Intent intent = new Intent();
-	        intent.setClass(SignInActivity.this, LoadingActivity.class);//跳转到加载界面
-	        startActivity(intent);	
-	        
-			String userName1 = userNameText.getText().toString();
+			intent.setClass(SignInActivity.this, LoadingActivity.class);// 跳转到加载界面
+			startActivity(intent);
+
+			String userName1 = userNameText.getText().toString().replace(" ", "");
 			String password = passwordText.getText().toString();
 			return UserAPI.sign_in(userName1, password);
 		}
@@ -163,7 +168,9 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 				new SyncSearchHistoryTask().execute(0);
 
 				// 以apikey的方式登录，一般放在主Activity的onCreate中
-//				PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY, Utils.getMetaValue(SignInActivity.this, "api_key"));
+				// PushManager.startWork(getApplicationContext(),
+				// PushConstants.LOGIN_TYPE_API_KEY,
+				// Utils.getMetaValue(SignInActivity.this, "api_key"));
 
 				Intent intent = new Intent();
 				intent.setClass(SignInActivity.this, MainActivity.class);
@@ -180,11 +187,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		}
 
 	}
-	
-
-	
-	
-	
 
 	@Override
 	public void onStart() {
@@ -197,7 +199,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	public void onResume() {
 		super.onResume();
 
-//		showChannelIds();
+		// showChannelIds();
 	}
 
 	@Override
@@ -223,13 +225,13 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	private void handleIntent(Intent intent) {
 		String action = intent.getAction();
 
-//		绑定
+		// 绑定
 		if (BaiduPushUtils.ACTION_RESPONSE.equals(action)) {
 			Log.i(tag, "绑定");
 			String method = intent.getStringExtra(BaiduPushUtils.RESPONSE_METHOD);
 
 			if (PushConstants.METHOD_BIND.equals(method)) {
-//				String toastStr = "";
+				// String toastStr = "";
 				int errorCode = intent.getIntExtra(BaiduPushUtils.RESPONSE_ERRCODE, 0);
 				if (errorCode == 0) {
 					String content = intent.getStringExtra(BaiduPushUtils.RESPONSE_CONTENT);
@@ -256,44 +258,42 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 					showChannelIds();
 
-//					toastStr = "Bind Success";
+					// toastStr = "Bind Success";
 				} else {
-//					toastStr = "Bind Fail, Error Code: " + errorCode;
+					// toastStr = "Bind Fail, Error Code: " + errorCode;
 					if (errorCode == 30607) {
 						Log.d("Bind Fail", "update channel token-----!");
 					}
 				}
 
-//				Toast.makeText(this, toastStr, Toast.LENGTH_LONG).show();
+				// Toast.makeText(this, toastStr, Toast.LENGTH_LONG).show();
 			}
-			
-//			登录
+
+			// 登录
 		} else if (BaiduPushUtils.ACTION_LOGIN.equals(action)) {
 			Log.i(tag, "登录");
 			String accessToken = intent.getStringExtra(BaiduPushUtils.EXTRA_ACCESS_TOKEN);
 			PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_ACCESS_TOKEN, accessToken);
-//			isLogin = true;
-//			initButton.setText("更换百度账号初始化Channel");
-			
-//			消息
+			// isLogin = true;
+			// initButton.setText("更换百度账号初始化Channel");
+
+			// 消息
 		} else if (BaiduPushUtils.ACTION_MESSAGE.equals(action)) {
 			Log.i(tag, "消息");
 			String message = intent.getStringExtra(BaiduPushUtils.EXTRA_MESSAGE);
-			
-			
-//			String summary = "Receive message from server:\n\t";
-//			Log.e(Utils.TAG, summary + message);
-//			JSONObject contentJson = null;
-//			String contentStr = message;
-//			try {
-//				contentJson = new JSONObject(message);
-//				contentStr = contentJson.toString(4);
-//			} catch (JSONException e) {
-//				Log.d(Utils.TAG, "Parse message json exception.");
-//			}
-//			summary += contentStr;
-			
-			
+
+			// String summary = "Receive message from server:\n\t";
+			// Log.e(Utils.TAG, summary + message);
+			// JSONObject contentJson = null;
+			// String contentStr = message;
+			// try {
+			// contentJson = new JSONObject(message);
+			// contentStr = contentJson.toString(4);
+			// } catch (JSONException e) {
+			// Log.d(Utils.TAG, "Parse message json exception.");
+			// }
+			// summary += contentStr;
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(message);
 			builder.setCancelable(true);
@@ -315,19 +315,20 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		channelId = sp.getString("channel_id", "");
 		userId = sp.getString("user_id", "");
 
-//		Resources resource = this.getResources();
-//		String pkgName = this.getPackageName();
-//		infoText = (TextView) findViewById(resource.getIdentifier("text", "id", pkgName));
+		// Resources resource = this.getResources();
+		// String pkgName = this.getPackageName();
+		// infoText = (TextView) findViewById(resource.getIdentifier("text",
+		// "id", pkgName));
 
 		String content = "\tApp ID: " + appId + "\n\tChannel ID: " + channelId + "\n\tUser ID: " + userId + "\n\t";
-		
+
 		UserAPI.update_baidu_user_id(userId);
-		
+
 		Log.i("-----", content);
-//		if (infoText != null) {
-//			infoText.setText(content);
-//			infoText.invalidate();
-//		}
+		// if (infoText != null) {
+		// infoText.setText(content);
+		// infoText.invalidate();
+		// }
 	}
 
 }
