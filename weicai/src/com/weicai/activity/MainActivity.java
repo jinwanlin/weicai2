@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		setTabSelection(0);
 		new UpdateBaiduUserId().execute(0);
 
-		new SyncSearchHistoryTask().execute(0);
+		new SyncSearchHistoryTask().execute(1000);
 
 	}
 

@@ -79,7 +79,7 @@ public class AmountsAdapter extends BaseAdapter {
 				
 				//已购买
 				if (!amount.equals("0")){
-					holder3.product_view.setBackgroundColor(Color.parseColor("#73E673"));
+					holder3.product_view.setBackgroundColor(Color.parseColor("#CCFFCC"));
 					
 					holder3.bt.setText(product.getOrderAmount() + product.getUnit());
 					holder3.bt.setBackgroundResource(R.drawable.bought_selector);

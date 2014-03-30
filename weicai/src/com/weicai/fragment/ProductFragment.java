@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.weicai.R;
@@ -205,14 +206,20 @@ public class ProductFragment extends Fragment {
 				productItemLV.setAdapter(productListAdapter);
 
 				if (products.isEmpty()) {
-					nothing_Find.setVisibility(View.VISIBLE);
+					TextView nothing_Find = new TextView(context);
+					nothing_Find.setText("未找到结果");
+					productItemLV.addFooterView(nothing_Find);
 				}
 			}
 
 			try {
 				if (searchKey != null && !searchKey.equals("")) {
 					return_all.setVisibility(View.VISIBLE);
-
+					Button return_all = new Button(context);
+					return_all.setText("查看所有");
+					productItemLV.addHeaderView(return_all);
+					productItemLV.addFooterView(return_all);
+					
 					if (products != null && products.size() > 0) {
 						searchHistoryDao.updateKeyword(json.getLong("search_history_id"), searchKey);
 					}
@@ -371,17 +378,38 @@ public class ProductFragment extends Fragment {
 			try {
 				last_order_state = Order.State.valueOf(json.getString("state").toUpperCase());
 				changeOrderState();
-
-				for (int i = 0; i < productItemLV.getChildCount(); i++) {
-					LinearLayout l = (LinearLayout) productItemLV.getChildAt(i);
-					Button b = (Button) l.getChildAt(4);
-					if (b.getText().equals("")) {
+				
+				if(last_order_state == Order.State.PENDING){
+					for (int i = 0; i < productItemLV.getChildCount(); i++) {
+						LinearLayout l = (LinearLayout) productItemLV.getChildAt(i);
+						Button b = (Button) l.getChildAt(4);
+						if (b.getText().equals("")) {
+							b.setText("购买");
+							b.setBackgroundResource(R.drawable.buy_selector);
+							b.setTextColor(Color.parseColor("#ffffff"));
+						}
+						b.setClickable(true);
+					}
+				}else{
+					Toast.makeText(context, "订单已出库，不能继续购买。", Toast.LENGTH_LONG).show();
+					for (int i = 0; i < productItemLV.getChildCount(); i++) {
+						LinearLayout l = (LinearLayout) productItemLV.getChildAt(i);
+						l.setBackgroundColor(Color.parseColor("#ffffff"));
+						Button b = (Button) l.getChildAt(4);
 						b.setText("购买");
 						b.setBackgroundResource(R.drawable.buy_selector);
 						b.setTextColor(Color.parseColor("#ffffff"));
+						b.setClickable(true);
 					}
-					b.setClickable(true);
+					
+					List<Product> products = ProductListAdapter.products;
+					for (int i = 0; i < products.size(); i++) {
+						Product product = products.get(i);
+						product.setOrderAmount(0);
+					}
+					
 				}
+				
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

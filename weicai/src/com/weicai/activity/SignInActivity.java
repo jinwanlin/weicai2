@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -71,7 +72,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 //			user1.setName("望湘园");
 //			user1.setPhone("18628405091");
 //			userDao.insert(user1);
-//			new SyncSearchHistoryTask().execute(0);
 //		}
 
 		User user = userDao.first();
@@ -176,12 +176,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 			if (state) {
 
 				User user = User.jsonToUser(userObj);
-				userDao.insert(user);
-
-				// 以apikey的方式登录，一般放在主Activity的onCreate中
-				// PushManager.startWork(getApplicationContext(),
-				// PushConstants.LOGIN_TYPE_API_KEY,
-				// Utils.getMetaValue(SignInActivity.this, "api_key"));
+				user = userDao.insert(user);
 
 				Intent intent = new Intent();
 				intent.setClass(SignInActivity.this, MainActivity.class);
@@ -196,7 +191,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 				}).show();
 			}
 		}
-
+ 
 	}
 
 	@Override
@@ -347,7 +342,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	
 	
 	public ProgressDialog pBar;
-	private Handler handler = new Handler();
 	private Double new_version = 1.0;
 	private String new_apkname = "";
 	Double old_version = 1.0;
@@ -465,7 +459,14 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	}
 
 	void down() {
-		handler.post(new Runnable() {
+		new Handler(){  
+	        @Override  
+	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
+	        	if(pBar!=null){
+	    			pBar.dismiss();
+	    		}
+	        }  
+	    }.post(new Runnable() {
 			public void run() {
 				pBar.cancel();
 				update();
@@ -473,7 +474,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		});
 
 	}
-
+ 
 	void update() {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory(), new_apkname)), "application/vnd.android.package-archive");
