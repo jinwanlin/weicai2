@@ -30,7 +30,7 @@ import com.weicai.util.tool.DoubleFormat;
 
 public class ProductListAdapter extends BaseAdapter {
 	static final String tag = "ProductListAdapter";
-	public static boolean has_dialog = false;
+//	public static boolean has_dialog = false;
 	private Context context;
 	public static AlertDialog dialog;
 
@@ -167,13 +167,13 @@ public class ProductListAdapter extends BaseAdapter {
 		return new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (has_dialog) {
-					return;
-				}
+//				if (has_dialog) {
+//					return;
+//				}
 
 				
 				Product product = (Product) getItem(position);
-				has_dialog = true;
+//				has_dialog = true;
 
 //				可能选择的滚动到中央
 				int may_select_amount = product.getOrderAmount();
@@ -193,7 +193,7 @@ public class ProductListAdapter extends BaseAdapter {
 				builder.setSingleChoiceItems(amountsAdapter, selection, null);
 				builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						has_dialog = false;
+//						has_dialog = false;
 					}
 				});
 

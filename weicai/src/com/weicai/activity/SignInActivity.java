@@ -1,25 +1,37 @@
 package com.weicai.activity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
@@ -28,7 +40,7 @@ import com.weicai.api.CaiCai;
 import com.weicai.api.UserAPI;
 import com.weicai.bean.User;
 import com.weicai.dao.UserDao;
-import com.weicai.task.SyncSearchHistoryTask;
+import com.weicai.update.Config;
 import com.weicai.util.tool.BaiduPushUtils;
 import com.weicai.util.tool.SIMCardInfo;
 
@@ -37,8 +49,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	private EditText passwordText;
 	private EditText userNameText;
 	private UserDao userDao;
-
-	// private boolean isLogin = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -49,18 +59,20 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		// 以apikey的方式登录，一般放在主Activity的onCreate中
 		PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY, BaiduPushUtils.getMetaValue(SignInActivity.this, "api_key"));
 
+		new UpdateAPK().execute(0);
+
 		userDao = UserDao.getInstance();
 		MyApplication.getInstance().addActivity(this);
 		BaseActivity.baseActivity = this;
 
-		// if(userDao.first()==null){
-		// User user1 = new User();
-		// user1.setId(3);
-		// user1.setName("望湘园");
-		// user1.setPhone("15810845422");
-		// userDao.insert(user1);
-		// new SyncSearchHistoryTask().execute(0);
-		// }
+//		if (userDao.first() == null) {
+//			User user1 = new User();
+//			user1.setId(1);
+//			user1.setName("望湘园");
+//			user1.setPhone("18628405091");
+//			userDao.insert(user1);
+//			new SyncSearchHistoryTask().execute(0);
+//		}
 
 		User user = userDao.first();
 		if (user != null) { // 已登录，跳转到首页
@@ -93,9 +105,9 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		if (!netStateUtils.isNetConnected()) {
 			new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("无法访问网络，请检查WIFI和3G是否打开！").setPositiveButton("确定", null).show();// show很关键
 		}
+
+
 	}
-
-
 
 	@Override
 	public void onClick(View v) {
@@ -165,7 +177,6 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 				User user = User.jsonToUser(userObj);
 				userDao.insert(user);
-				new SyncSearchHistoryTask().execute(0);
 
 				// 以apikey的方式登录，一般放在主Activity的onCreate中
 				// PushManager.startWork(getApplicationContext(),
@@ -322,13 +333,151 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 		String content = "\tApp ID: " + appId + "\n\tChannel ID: " + channelId + "\n\tUser ID: " + userId + "\n\t";
 
-		UserAPI.update_baidu_user_id(userId);
-
 		Log.i("-----", content);
 		// if (infoText != null) {
 		// infoText.setText(content);
 		// infoText.invalidate();
 		// }
+	}
+	
+
+	
+	
+	
+	
+	
+	public ProgressDialog pBar;
+	private Handler handler = new Handler();
+	private Double new_version = 1.0;
+	private String new_apkname = "";
+	Double old_version = 1.0;
+
+	class UpdateAPK extends NetTask {
+
+		@Override
+		protected String doInBackground(Integer... params) {
+
+			return CaiCai.lastVersion();
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			if (result.equals("")) {
+				return;
+			}
+			
+			old_version = Config.getCurrentVersion(SignInActivity.this);
+			try {
+				JSONObject obj = new JSONObject(result);
+				try {
+					new_version = obj.getDouble("version");
+					new_apkname = obj.getString("apkname");
+				} catch (Exception e) {
+				}
+			} catch (Exception e) {
+				Log.e(tag, e.getMessage());
+			}
+			
+			if (new_version > old_version) {
+				doNewVersionUpdate();
+			} else {
+//				notNewVersionShow();
+			}
+			
+		}
+
+	}
+	private void doNewVersionUpdate() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("当前版本:");
+		sb.append(old_version);
+		sb.append(", 发现新版本:");
+		sb.append(new_version);
+		sb.append(", 是否更新?");
+		Dialog dialog = new AlertDialog.Builder(this).setTitle("软件更新").setMessage(sb.toString())
+		// 设置内容
+				.setPositiveButton("更新",// 设置确定按钮
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								pBar = new ProgressDialog(SignInActivity.this);
+								pBar.setTitle("正在下载");
+								pBar.setMessage("请稍候...");
+								pBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+								downFile(CaiCai.BASE_URL + "/" + new_apkname);
+							}
+
+						}).setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// 点击"取消"按钮之后退出程序
+//						finish();
+					}
+				}).create();// 创建
+		// 显示对话框
+		dialog.show();
+	}
+
+	void downFile(final String url) {
+		pBar.show();
+		new Thread() {
+			public void run() {
+				HttpClient client = new DefaultHttpClient();
+				HttpGet get = new HttpGet(url);
+				HttpResponse response;
+				try {
+					response = client.execute(get);
+					HttpEntity entity = response.getEntity();
+					long length = entity.getContentLength();
+					InputStream is = entity.getContent();
+					FileOutputStream fileOutputStream = null;
+					if (is != null) {
+
+						File file = new File(Environment.getExternalStorageDirectory(), new_apkname);
+						fileOutputStream = new FileOutputStream(file);
+
+						byte[] buf = new byte[1024];
+						int ch = -1;
+//						int count = 0;
+						while ((ch = is.read(buf)) != -1) {
+							fileOutputStream.write(buf, 0, ch);
+//							count += ch;
+							if (length > 0) {
+							}
+						}
+
+					}
+					fileOutputStream.flush();
+					if (fileOutputStream != null) {
+						fileOutputStream.close();
+					}
+					down();
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}.start();
+
+	}
+
+	void down() {
+		handler.post(new Runnable() {
+			public void run() {
+				pBar.cancel();
+				update();
+			}
+		});
+
+	}
+
+	void update() {
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory(), new_apkname)), "application/vnd.android.package-archive");
+		startActivity(intent);
 	}
 
 }

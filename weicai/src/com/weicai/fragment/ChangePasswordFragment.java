@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,10 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.weicai.R;
-import com.weicai.activity.BaseActivity;
+import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.activity.LoadingActivity;
 import com.weicai.activity.MainActivity;
-import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.api.CaiCai;
 import com.weicai.api.UserAPI;
 import com.weicai.dao.UserDao;
@@ -93,5 +93,8 @@ public class ChangePasswordFragment extends Fragment implements OnClickListener 
 		}
 
 	}
+	
 
 }
+
+

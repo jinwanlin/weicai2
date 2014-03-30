@@ -64,14 +64,14 @@ public class ClassifyAdapter extends BaseAdapter {
 		holder.icon = (ImageView) convertView.findViewById(R.id.icon);
 		convertView.setTag(holder);
 		if(classifies[position][0].equals("")){
-			holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.all));
+			holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.all_classify));
 		}else{
 			showImage(holder.icon, img_base_url+classifies[position][0]+".png");
 		}
 
 		if(position == 0){
 			LinearLayout ly = (LinearLayout)holder.classify.getParent();
-			ly.setBackgroundColor(Color.CYAN);
+			ly.setBackgroundColor(Color.parseColor("#73E673"));
 		}
 		
 		holder.classify.setText(classifies[position][1]);
@@ -83,7 +83,7 @@ public class ClassifyAdapter extends BaseAdapter {
 				for (int j = 0; j < MenuFragment.product_items.getChildCount(); j++) {
 					LinearLayout line = (LinearLayout)MenuFragment.product_items.getChildAt(j);
 					if(j==position){
-						line.getChildAt(0).setBackgroundColor(Color.CYAN);
+						line.getChildAt(0).setBackgroundColor(Color.parseColor("#73E673"));
 					}else{
 						line.getChildAt(0).setBackgroundColor(Color.WHITE);
 					}
@@ -121,7 +121,7 @@ public class ClassifyAdapter extends BaseAdapter {
 		if (bitmap != null) {
 			mImageView.setImageBitmap(bitmap);
 		} else {
-			mImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.all));
+			mImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.all_classify));
 		}
 	}
 }

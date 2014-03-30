@@ -5,6 +5,7 @@ import java.util.Map;
 
 import android.util.Log;
 
+import com.weicai.activity.BaseActivity;
 import com.weicai.util.net.HttpUtils;
 
 
@@ -63,12 +64,15 @@ public class UserAPI extends CaiCai {
 	 * 修改用户百度推送的用户ID
 	 * @return
 	 */
-	public static String update_baidu_user_id(String baidu_user_id) {
+	public static String update_baidu_user_id() {
+		if (userDao.first()==null){
+			return "";
+		}
 		String url = BASE_URL + "/api/v2/users/update_baidu_user_id";
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("baidu_user_id", baidu_user_id);
+		map.put("baidu_user_id", BaseActivity.baidu_user_id);
 		map.put("id", userDao.first().getId()+"");
-		String result = HttpUtils.doPost(url, map);
+		String result = HttpUtils.doPost(url, map); 
 		
 		Log.i(TAG, "update_baidu_user_id:" + result);
 		return result;

@@ -11,7 +11,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.baidu.android.pushservice.PushConstants;
-import com.weicai.bean.Order;
+import com.weicai.fragment.OrderFragment;
+import com.weicai.fragment.OrdersFragment;
 import com.weicai.fragment.ProductFragment;
 
 /**
@@ -44,11 +45,13 @@ public class PushMessageReceiver extends BroadcastReceiver {
 				JSONObject json = new JSONObject(content);
 				String message = json.getString("message");
 				String state = json.getString("state");
-				ProductFragment.last_order_state = Order.State.valueOf(state.toUpperCase());
-				ProductFragment.changeOrderState();
-				ProductFragment.sss();
+				String order_no = json.getString("order_no");
+				String orderId = json.getString("order_id");
+				
+				ProductFragment.updateProducts(orderId, state);
+				OrdersFragment.updateOrders(order_no, state);
+				OrderFragment.updateOrders(orderId, state);
 
-//				TODO
 				Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
 			} catch (JSONException e) {
@@ -98,7 +101,7 @@ public class PushMessageReceiver extends BroadcastReceiver {
 //					String channel_id = response_params.getString("channel_id");
 					String user_id = response_params.getString("user_id");
 					
-//					CaiCai.update_baidu_user_id(user_id);
+					BaseActivity.baidu_user_id = user_id;
 					Log.i(TAG, "user_id: "+user_id);
 				}
 						

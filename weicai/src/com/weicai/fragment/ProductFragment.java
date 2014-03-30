@@ -420,18 +420,21 @@ public class ProductFragment extends Fragment {
 		}
 	}
 	
-	public static void sss(){
-		ProductListAdapter.resetOrderAmount();
-		
-		for (int i = 0; i < productItemLV.getChildCount(); i++) {
-			LinearLayout l = (LinearLayout) productItemLV.getChildAt(i);
-			l.setBackgroundColor(Color.parseColor("#ffffff"));
+	public static void updateProducts(String orderId, String orderState){
+		if(orderId.equals(last_order_id+"")){
+			last_order_state = Order.State.valueOf(orderState.toUpperCase());
+			changeOrderState();
+			ProductListAdapter.resetOrderAmount();
+			for (int i = 0; i < productItemLV.getChildCount(); i++) {
+				LinearLayout l = (LinearLayout) productItemLV.getChildAt(i);
+				l.setBackgroundColor(Color.parseColor("#ffffff"));
 
-			Button b = (Button) l.getChildAt(4);
-			b.setText("购买");
-			b.setTextColor(Color.parseColor("#ffffff"));
-			b.setBackgroundResource(R.drawable.buy_selector);
-			b.setClickable(true);
+				Button b = (Button) l.getChildAt(4);
+				b.setText("购买");
+				b.setTextColor(Color.parseColor("#ffffff"));
+				b.setBackgroundResource(R.drawable.buy_selector);
+				b.setClickable(true);
+			}
 		}
 	}
 

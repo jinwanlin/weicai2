@@ -26,6 +26,7 @@ public abstract class BaseActivity extends FragmentActivity {
 	public static BaseActivity baseActivity;
 	public static LoadingActivity loadingActivity;
 	public MainActivity mainActivity;
+	public static String baidu_user_id;
 
 	@SuppressLint("NewApi")
 	@Override

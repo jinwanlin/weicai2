@@ -3,15 +3,12 @@ package com.weicai.activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +16,7 @@ import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.weicai.R;
+import com.weicai.api.UserAPI;
 import com.weicai.fragment.ChangePasswordFragment;
 import com.weicai.fragment.OrderFragment;
 import com.weicai.fragment.OrdersFragment;
@@ -27,6 +25,7 @@ import com.weicai.fragment.ProductFragment;
 import com.weicai.fragment.RechargeFragment;
 import com.weicai.fragment.SearchFragment;
 import com.weicai.fragment.SettingFragment;
+import com.weicai.task.SyncSearchHistoryTask;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
 	static final String tag = "MainActivity";
@@ -39,7 +38,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	public SettingFragment settingFragment;
 
 	public LinearLayout bottom_menu;
-	
+
 	private View productsLayout;
 	private View ordersLayout;
 	private View paymentsLayout;
@@ -74,6 +73,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 		initViews();
 		setTabSelection(0);
+		new UpdateBaiduUserId().execute(0);
+
+		new SyncSearchHistoryTask().execute(0);
+
 	}
 
 	/**
@@ -87,7 +90,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		paymentsLayout = findViewById(R.id.payments_layout);
 		settingLayout = findViewById(R.id.setting_layout);
 
-        bottom_menu = (LinearLayout) findViewById(R.id.bottom_menu);
+		bottom_menu = (LinearLayout) findViewById(R.id.bottom_menu);
 		productsImage = (ImageView) findViewById(R.id.products_image);
 		ordersImage = (ImageView) findViewById(R.id.orders_image);
 		paymentsImage = (ImageView) findViewById(R.id.payments_image);
@@ -142,8 +145,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			}
 		}
 
-		Log.i(tag, "点击："+index);
-		
+		Log.i(tag, "点击：" + index);
+
 		// 每次选中之前先清楚掉上次的选中状态
 		clearSelection();
 		// 开启一个Fragment事务
@@ -160,9 +163,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 				productFragment = new ProductFragment();
 				productFragment.setContext(this);
 				transaction.add(R.id.content, productFragment);
-			
+
 				// 加载菜单
-				productFragment.showMenu(); 
+				productFragment.showMenu();
 			} else {
 				// 如果ProductsFragment不为空，则直接将它显示出来
 				transaction.show(productFragment);
@@ -194,15 +197,15 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			// 当点击了设置tab时，改变控件的图片和文字颜色
 			settingImage.setImageResource(R.drawable.settings_selected);
 			settingText.setTextColor(Color.WHITE);
-//			if (settingFragment == null) {
-				// 如果SettingFragment为空，则创建一个并添加到界面上
-				settingFragment = new SettingFragment();
-				settingFragment.setMainActivity(this);
-				transaction.add(R.id.content, settingFragment);
-//			} else {
-//				// 如果SettingFragment不为空，则直接将它显示出来
-//				transaction.show(settingFragment);
-//			}
+			// if (settingFragment == null) {
+			// 如果SettingFragment为空，则创建一个并添加到界面上
+			settingFragment = new SettingFragment();
+			settingFragment.setMainActivity(this);
+			transaction.add(R.id.content, settingFragment);
+			// } else {
+			// // 如果SettingFragment不为空，则直接将它显示出来
+			// transaction.show(settingFragment);
+			// }
 			break;
 		}
 		transaction.commit();
@@ -253,7 +256,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		if (searchFragment != null) {
 			transaction.hide(searchFragment);
 		}
-		
 
 	}
 
@@ -296,7 +298,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		transaction.add(R.id.content, changePasswordFragment);
 		transaction.commit();
 	}
-	
 
 	public void showSearch() {
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -311,22 +312,22 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		bottom_menu.setVisibility(View.GONE);
 		menu.setSlidingEnabled(false);
 	}
-	
+
 	public void searchCancel() {
 		bottom_menu.setVisibility(View.VISIBLE);
-		
+
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		hideFragments(transaction);
-		
+
 		transaction.show(productFragment);
 		transaction.commit();
-		
+
 		menu.setSlidingEnabled(true);
 	}
-	
+
 	public void searchProduct(String type, String classify, String searchKey) {
 		bottom_menu.setVisibility(View.VISIBLE);
-		
+
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		hideFragments(transaction);
 
@@ -335,13 +336,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		productFragment.classify = classify;
 		productFragment.searchKey = searchKey;
 		productFragment.setContext(this);
-		
+
 		transaction.add(R.id.content, productFragment);
 		transaction.commit();
-		
+
 		menu.setSlidingEnabled(true);
 	}
-	
+
 	/** 后退一步 */
 	public void back() {
 		if (lastFragment != null) {
@@ -358,7 +359,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 
-			if (menu!=null && menu.isMenuShowing()) {
+			if (menu != null && menu.isMenuShowing()) {
 				menu.showContent();
 				return false;
 			} else {
@@ -369,4 +370,19 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		}
 
 	}
+
+	class UpdateBaiduUserId extends NetTask {
+
+		@Override
+		protected String doInBackground(Integer... params) {
+			return UserAPI.update_baidu_user_id();
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+		}
+
+	}
+
 }

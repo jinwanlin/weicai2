@@ -66,20 +66,20 @@ public class AmountsAdapter extends BaseAdapter {
 		final String amount = (String) getItem(position);
 		holder.amount.setText(amount + product.getUnit());
 		if (product.getOrderAmount() != 0 && amount.equals(product.getOrderAmount() + "")) {
-			holder.amount.setBackgroundColor(Color.CYAN);
+			holder.amount.setBackgroundColor(Color.parseColor("#73E673"));
 		}
 
 		convertView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ProductListAdapter.has_dialog = false;
+//				ProductListAdapter.has_dialog = false;
 				ProductListAdapter.dialog.cancel();
 
 				product.setOrderAmount(Integer.parseInt(amount));
 				
 				//已购买
 				if (!amount.equals("0")){
-					holder3.product_view.setBackgroundColor(Color.parseColor("#CCFFCC"));
+					holder3.product_view.setBackgroundColor(Color.parseColor("#73E673"));
 					
 					holder3.bt.setText(product.getOrderAmount() + product.getUnit());
 					holder3.bt.setBackgroundResource(R.drawable.bought_selector);

@@ -134,7 +134,7 @@
                 android:src="@drawable/setting_arrow" />
         </RelativeLayout>
 
-        <TextView
+       <!--  <TextView
             android:layout_width="match_parent"
             android:layout_height="0.8dip"
             android:layout_marginLeft="50dp"
@@ -171,7 +171,7 @@
                 android:paddingRight="15dp"
                 android:paddingTop="20dp"
                 android:src="@drawable/setting_arrow" />
-        </RelativeLayout>
+        </RelativeLayout> -->
 
     </LinearLayout>
 
@@ -183,6 +183,7 @@
         android:layout_marginRight="15dp"
         android:layout_marginTop="20dp"
         android:background="#e00"
+        android:textColor="#fff"
         android:text="安全退出" />
 
 </LinearLayout>

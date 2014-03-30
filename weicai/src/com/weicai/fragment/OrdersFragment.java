@@ -12,23 +12,27 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.weicai.R;
 import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.activity.LoadingActivity;
 import com.weicai.activity.MainActivity;
 import com.weicai.adapter.OrderListAdapter;
+import com.weicai.adapter.ProductListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;
 import com.weicai.bean.Order;
+import com.weicai.bean.Order.State;
 
 public class OrdersFragment extends Fragment {
 
 	static final String tag = "OrdersFragment";
 
-	private ListView orderListLV;
+	private static ListView orderListLV;
 	private Context context;
 	private RelativeLayout no_values_layout;
 	
@@ -92,5 +96,27 @@ public class OrdersFragment extends Fragment {
 			orderListLV.setAdapter(orderListAdapter);
 		}
 	}
+	
+	public static void updateOrders(String order_no, String state){
+//		ProductListAdapter.resetOrderAmount();
+		if(orderListLV != null){
+			for (int i = 0; i < orderListLV.getChildCount(); i++) {
+				LinearLayout orderLine = (LinearLayout) orderListLV.getChildAt(i);
+				orderLine = (LinearLayout)orderLine.getChildAt(0);
+				
+				LinearLayout secondRole = (LinearLayout)orderLine.getChildAt(1);
+				TextView orderNo = (TextView)secondRole.getChildAt(1);
+				
+				if(order_no.equals(orderNo.getText().toString())){
+					LinearLayout lastRow = (LinearLayout)orderLine.getChildAt(2);
+					TextView orderState = (TextView)lastRow.getChildAt(1);
+					Order o = new Order();
+					o.setState(state);
+					orderState.setText(o.getStateStr());
+					break;
+				}
+			}
+		}
 
+	}
 }

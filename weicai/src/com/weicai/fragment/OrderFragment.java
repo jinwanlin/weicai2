@@ -28,6 +28,7 @@ import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.activity.LoadingActivity;
 import com.weicai.activity.MainActivity;
 import com.weicai.adapter.OrderItemListAdapter;
+import com.weicai.adapter.ProductListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;
 import com.weicai.bean.Order;
@@ -40,14 +41,13 @@ public class OrderFragment extends Fragment implements OnClickListener {
 	static final String tag = "OrderFragment";
 
 	private Fragment lastFragment;
-	private long order_id;
+	private static long order_id;
 	private ListView orderItemsLV;
-	private TextView sn, state, date, total;
+	private static TextView sn, state, date, total;
 	private LinearLayout order_info, items_header;
-	private Button cancel_order;
+	private static Button cancel_order;
 	public TextView amount_title;
 	public TextView total_title;
-	
 	private Context context;
 	
 	public void setContext(Context context){
@@ -209,5 +209,31 @@ public class OrderFragment extends Fragment implements OnClickListener {
 		}
 	}
 
+	public static void updateOrders(String orderId, String orderState){
+		if(cancel_order!=null && orderId.equals(order_id+"")){
+			cancel_order.setVisibility(View.GONE);
+			Order order = new Order();
+			order.setState(orderState);
+			state.setText(order.getStateStr());
+		}
+		
+		
+//		for (int i = 0; i < orderListLV.getChildCount(); i++) {
+//			LinearLayout orderLine = (LinearLayout) orderListLV.getChildAt(i);
+//			orderLine = (LinearLayout)orderLine.getChildAt(0);
+//			
+//			LinearLayout secondRole = (LinearLayout)orderLine.getChildAt(1);
+//			TextView orderNo = (TextView)secondRole.getChildAt(1);
+//			
+//			if(order_no.equals(orderNo.getText().toString())){
+//				LinearLayout lastRow = (LinearLayout)orderLine.getChildAt(2);
+//				TextView orderState = (TextView)lastRow.getChildAt(1);
+//				Order o = new Order();
+//				o.setState(state);
+//				orderState.setText(o.getStateStr());
+//				break;
+//			}
+//		}
+	}
 
 }

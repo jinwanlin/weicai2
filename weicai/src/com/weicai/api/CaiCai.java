@@ -1,12 +1,18 @@
 package com.weicai.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.weicai.dao.SearchHistoryDao;
 import com.weicai.dao.UserDao;
 //import android.util.Log;
+import com.weicai.util.net.HttpUtils;
 
 public class CaiCai {
 	public static final String TAG = CaiCai.class.getSimpleName();
@@ -61,5 +67,15 @@ public class CaiCai {
 		return json;
 	}
 
+	/**
+	 * 最新版本
+	 * 
+	 * @return
+	 */
+	public static String lastVersion() {
+		Log.i(TAG, "lastVersion");
+		String url = BASE_URL + "/api/versions/last_version";
+		return HttpUtils.doGet(url);
+	}
 
 }
