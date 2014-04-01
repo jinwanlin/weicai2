@@ -17,7 +17,7 @@ public class OrderAPI extends CaiCai {
 	 * @return
 	 */
 	public static String orders() {
-		String url = BASE_URL + "/api/v2/orders/list";
+		String url = server_host + "/api/v2/orders/list";
 		
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[id]", userDao.first().getId()+"");
@@ -32,7 +32,7 @@ public class OrderAPI extends CaiCai {
 	 * @return
 	 */
 	public static String order(long id) {
-		String url = BASE_URL + "/api/v2/orders/"+id;
+		String url = server_host + "/api/v2/orders/"+id;
 		return HttpUtils.doGet(url);
 	}
 	
@@ -45,7 +45,7 @@ public class OrderAPI extends CaiCai {
 	 * @return
 	 */
 	public static String buy(String product_id, String amount) {
-		String url = BASE_URL + "/api/v2/order_items";
+		String url = server_host + "/api/v2/order_items";
 
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("order_item[product_id]", product_id);
@@ -58,7 +58,7 @@ public class OrderAPI extends CaiCai {
 
 	
 	public static String autoMakeOrder() {
-		String url = BASE_URL + "/api/v2/orders/auto_make_order";
+		String url = server_host + "/api/v2/orders/auto_make_order";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[id]", userDao.first().getId()+"");
 
@@ -66,18 +66,18 @@ public class OrderAPI extends CaiCai {
 	}
 	
 	public static String submitOrder(long order_id) {
-		String url = BASE_URL + "/api/v2/orders/"+order_id+"/submit";
+		String url = server_host + "/api/v2/orders/"+order_id+"/submit";
 		return HttpUtils.doGet(url);
 	}
 	
 	
 	public static String continueBuy(long order_id) {
-		String url = BASE_URL + "/api/v2/orders/"+order_id+"/continue_buy";
+		String url = server_host + "/api/v2/orders/"+order_id+"/continue_buy";
 		return HttpUtils.doGet(url);
 	}
 	
 	public static String cancelOrder(long order_id) {
-		String url = BASE_URL + "/api/v2/orders/"+order_id+"/cancel";
+		String url = server_host + "/api/v2/orders/"+order_id+"/cancel";
 		return HttpUtils.doGet(url);
 	}
 }

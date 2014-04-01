@@ -36,13 +36,15 @@ import com.weicai.api.ProductAPI;
 import com.weicai.bean.Order;
 import com.weicai.bean.Product;
 import com.weicai.dao.SearchHistoryDao;
+//import android.widget.LinearLayout;
+//import android.widget.LinearLayout;
 
 public class ProductFragment extends Fragment {
 	static final String tag = "ProductFragment";
 	private ImageButton product_type;
 	private LinearLayout search_ll;
 	public static ListView productItemLV;
-	public static Button auto_make_order, submit, continue_buy, search, return_all;
+	public static Button auto_make_order, submit, continue_buy, search;
 	private static TextView nothing_Find, search_textview;
 	private Context context;
 	public static long last_order_id;
@@ -71,7 +73,6 @@ public class ProductFragment extends Fragment {
 		continue_buy = (Button) messageLayout.findViewById(R.id.continue_buy);
 		search_ll = (LinearLayout) messageLayout.findViewById(R.id.search_ll);
 		search_textview = (TextView) messageLayout.findViewById(R.id.search_textview);
-		return_all = (Button) messageLayout.findViewById(R.id.return_all);
 		nothing_Find = (TextView) messageLayout.findViewById(R.id.nothing_Find);
 		product_type = (ImageButton) messageLayout.findViewById(R.id.product_type);
 
@@ -79,7 +80,6 @@ public class ProductFragment extends Fragment {
 		auto_make_order.setOnClickListener(autoMakeOrderButtonListner());
 		continue_buy.setOnClickListener(continueBuyButtonListner());
 		search_ll.setOnClickListener(searchButtonListner());
-		return_all.setOnClickListener(returnAllButtonListner());
 		product_type.setOnClickListener(productTypeButtonListner());
 
 		new refreshProductsTask().execute(0);
@@ -183,7 +183,6 @@ public class ProductFragment extends Fragment {
 			}
 
 			nothing_Find.setVisibility(View.GONE);
-			return_all.setVisibility(View.GONE);
 
 			JSONObject json = CaiCai.StringToJSONObject(result);
 			JSONArray jsonArray = null;
@@ -199,41 +198,97 @@ public class ProductFragment extends Fragment {
 				e.printStackTrace();
 			}
 
+			
 			List<Product> products = null;
 			if (jsonArray != null) {
 				products = Product.jsonToList(jsonArray);
+
+				try {
+					Log.i(tag, productItemLV.getFooterViewsCount()+"==++");
+					
+					if (searchKey != null && !searchKey.equals("")) {
+						if(productItemLV.getFooterViewsCount()==0){
+							productItemLV.addFooterView(searAllbutton());
+						}
+						
+						if (products != null && products.size() > 0) {
+							searchHistoryDao.updateKeyword(json.getLong("search_history_id"), searchKey);
+						}
+						search_textview.setText(searchKey);
+					} else {
+						if(productItemLV.getFooterViewsCount()>0){
+							productItemLV.removeFooterView(search_button);
+						}
+						search_textview.setText("点击搜索");
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
 				ProductListAdapter productListAdapter = new ProductListAdapter(context, products);
 				productItemLV.setAdapter(productListAdapter);
 
 				if (products.isEmpty()) {
-					TextView nothing_Find = new TextView(context);
-					nothing_Find.setText("未找到结果");
-					productItemLV.addFooterView(nothing_Find);
+					nothing_Find.setVisibility(View.VISIBLE);					
+				}else{
+					nothing_Find.setVisibility(View.GONE);					
 				}
 			}
 
-			try {
-				if (searchKey != null && !searchKey.equals("")) {
-					return_all.setVisibility(View.VISIBLE);
-					Button return_all = new Button(context);
-					return_all.setText("查看所有");
-					productItemLV.addHeaderView(return_all);
-					productItemLV.addFooterView(return_all);
-					
-					if (products != null && products.size() > 0) {
-						searchHistoryDao.updateKeyword(json.getLong("search_history_id"), searchKey);
-					}
-					search_textview.setText(searchKey);
-				} else {
-					search_textview.setText("点击搜索");
-				}
-				
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+
 
 		}
 
+	}
+	
+//	static LinearLayout footer_layout;
+//	private View list_footer() {
+//		
+//
+//		if(footer_layout!=null){
+//			return footer_layout;
+//		}
+//
+//		// LinearLayout.LayoutParams params = new
+//		// LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+//		// LayoutParams.WRAP_CONTENT);
+////		LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1.0f);
+////		param.setMargins(15, 15, 15, 15);
+//		// params.setLayoutDirection(layoutDirection);
+//
+//		footer_layout = new LinearLayout(context);
+//		footer_layout.setOrientation(LinearLayout.HORIZONTAL);
+//		footer_layout.setWeightSum(1f);
+//		footer_layout.setPadding(10, 10, 10, 10);
+//
+////		EditText keywords_view = new EditText(context);
+////		keywords_view.setHint("请输入搜索关键字");
+////		keywords_view.setLayoutParams(param);
+////		search_line_layout.addView(keywords_view);
+//
+//		Button search_button = new Button(context);
+//		search_button.setText("查看所有");
+//		search_button.setOnClickListener(returnAllButtonListner());
+//		footer_layout.addView(search_button);
+//
+//
+//		LinearLayout search_history_layout = new LinearLayout(context);
+//		search_history_layout.setOrientation(LinearLayout.VERTICAL);
+//
+//		search_history_layout.addView(footer_layout);
+//		
+////		footer.addView(footer_layout);
+//		return footer_layout;
+//	}
+	
+	static Button search_button;
+	private Button searAllbutton(){
+		if(search_button == null){
+			search_button = new Button(context);
+			search_button.setText("查看所有");
+			search_button.setOnClickListener(returnAllButtonListner());
+		}
+		return search_button;
 	}
 
 	/***
@@ -328,6 +383,8 @@ public class ProductFragment extends Fragment {
 						if (b.getText().equals("购买")) {
 							b.setText("");
 							b.setBackgroundColor(Color.parseColor("#ffffff"));
+						}else{
+							b.setBackgroundColor(Color.parseColor("#CCFFCC"));
 						}
 						b.setClickable(false);
 					}
@@ -387,6 +444,8 @@ public class ProductFragment extends Fragment {
 							b.setText("购买");
 							b.setBackgroundResource(R.drawable.buy_selector);
 							b.setTextColor(Color.parseColor("#ffffff"));
+						}else{
+							b.setBackgroundResource(R.drawable.bought_selector);
 						}
 						b.setClickable(true);
 					}

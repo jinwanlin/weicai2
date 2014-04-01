@@ -63,7 +63,7 @@ public class ProductListAdapter extends BaseAdapter {
 
 	@Override
 	public long getItemId(int position) {
-		return products.get(position).getId();
+		return 0;
 	}
 
 	public String getImgUrl(int position) {
@@ -126,6 +126,10 @@ public class ProductListAdapter extends BaseAdapter {
 			
 			holder.bt.setText(product.getOrderAmount() + product.getUnit());
 			holder.bt.setBackgroundResource(R.drawable.bought_selector);
+			if(ProductFragment.last_order_state != Order.State.PENDING){
+				holder.bt.setBackgroundColor(Color.parseColor("#CCFFCC"));
+			}
+			
 			holder.bt.setTextColor(Color.parseColor("#000000"));
 		}else{ // 未购买
 			holder.product_view.setBackgroundColor(Color.WHITE);

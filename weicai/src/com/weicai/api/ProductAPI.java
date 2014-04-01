@@ -19,7 +19,7 @@ public class ProductAPI extends CaiCai {
 	 * @return
 	 */
 	public static String list(String type, String classify, String searchKey) {
-		String url = BASE_URL + "/api/v2/products/list";
+		String url = server_host + "/api/v2/products/list";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[id]", userDao.first().getId()+"");
 		if(type!=null){
@@ -43,7 +43,7 @@ public class ProductAPI extends CaiCai {
 	 * @return
 	 */
 	public static String types() {
-		String url = BASE_URL + "/api/v2/products/types";
+		String url = server_host + "/api/v2/products/types";
 		return HttpUtils.doGet(url);
 	}
 }

@@ -1,8 +1,5 @@
 package com.weicai.api;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +8,8 @@ import android.util.Log;
 
 import com.weicai.dao.SearchHistoryDao;
 import com.weicai.dao.UserDao;
-//import android.util.Log;
 import com.weicai.util.net.HttpUtils;
+//import android.util.Log;
 
 public class CaiCai {
 	public static final String TAG = CaiCai.class.getSimpleName();
@@ -25,8 +22,9 @@ public class CaiCai {
 		searchHistoryDao = SearchHistoryDao.getInstance();
 	}
 
-	public static final String BASE_URL = "http://192.168.0.103:3000";
-//	public static final String BASE_URL = "http://115.28.160.65";
+	public static String mac_pro = "http://192.168.0.103:3000";
+	public static String server_host;
+	public static String aliyun = "http://115.28.160.65";
 
 	/**
 	 * String 转 JSONObject
@@ -74,7 +72,7 @@ public class CaiCai {
 	 */
 	public static String lastVersion() {
 		Log.i(TAG, "lastVersion");
-		String url = BASE_URL + "/api/versions/last_version";
+		String url = server_host + "/api/versions/last_version";
 		return HttpUtils.doGet(url);
 	}
 

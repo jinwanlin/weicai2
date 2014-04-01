@@ -19,7 +19,7 @@ public class PaymentAPI extends CaiCai {
 	 * @return
 	 */
 	public static String payment(long id) {
-		String url = BASE_URL + "/api/v2/payments/"+id;
+		String url = server_host + "/api/v2/payments/"+id;
 		return HttpUtils.doGet(url);
 	}
 	
@@ -29,7 +29,7 @@ public class PaymentAPI extends CaiCai {
 	 * @return
 	 */
 	public static String payments() {
-		String url = BASE_URL + "/api/v2/payments/list";
+		String url = server_host + "/api/v2/payments/list";
 		
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[id]", userDao.first().getId()+"");

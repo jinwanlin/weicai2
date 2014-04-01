@@ -50,29 +50,60 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	private EditText passwordText;
 	private EditText userNameText;
 	private UserDao userDao;
-
+	private boolean isTest = true;
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+		
+		String this_phone = new SIMCardInfo(SignInActivity.this).getNativePhoneNumber().replace("+86", "");
+		if( isTest && (this_phone.equals("18628405091") || this_phone.equals("15810845422"))){
+			CaiCai.server_host = CaiCai.mac_pro;
+		}else{
+			CaiCai.server_host = CaiCai.aliyun;
+		}
+		
+		
+		
 		// 以apikey的方式登录，一般放在主Activity的onCreate中
 		PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY, BaiduPushUtils.getMetaValue(SignInActivity.this, "api_key"));
 
+		
+		mHandler = new Handler() {
+			public void handleMessage(Message msg) {
+				// 获取传递的数据
+				Bundle data = msg.getData();
+				String url = data.getString("url");
+				downFile(url);
+			};
+		};
+		
+		down = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法
+				if (pBar != null) {
+					pBar.dismiss();
+				}
+			}
+		};
+		
+		
 		new UpdateAPK().execute(0);
-
+		
 		userDao = UserDao.getInstance();
 		MyApplication.getInstance().addActivity(this);
 		BaseActivity.baseActivity = this;
 
-//		if (userDao.first() == null) {
-//			User user1 = new User();
-//			user1.setId(1);
-//			user1.setName("望湘园");
-//			user1.setPhone("18628405091");
-//			userDao.insert(user1);
-//		}
+		// if (userDao.first() == null) {
+		// User user1 = new User();
+		// user1.setId(1);
+		// user1.setName("望湘园");
+		// user1.setPhone("18628405091");
+		// userDao.insert(user1);
+		// }
 
 		User user = userDao.first();
 		if (user != null) { // 已登录，跳转到首页
@@ -106,6 +137,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 			new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("无法访问网络，请检查WIFI和3G是否打开！").setPositiveButton("确定", null).show();// show很关键
 		}
 
+		
 
 	}
 
@@ -191,7 +223,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 				}).show();
 			}
 		}
- 
+
 	}
 
 	@Override
@@ -334,13 +366,9 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 		// infoText.invalidate();
 		// }
 	}
-	
 
-	
-	
-	
-	
-	
+	private Handler mHandler, down;
+
 	public ProgressDialog pBar;
 	private Double new_version = 1.0;
 	private String new_apkname = "";
@@ -360,7 +388,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 			if (result.equals("")) {
 				return;
 			}
-			
+
 			old_version = Config.getCurrentVersion(SignInActivity.this);
 			try {
 				JSONObject obj = new JSONObject(result);
@@ -372,16 +400,17 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 			} catch (Exception e) {
 				Log.e(tag, e.getMessage());
 			}
-			
+
 			if (new_version > old_version) {
 				doNewVersionUpdate();
 			} else {
-//				notNewVersionShow();
+				// notNewVersionShow();
 			}
-			
+
 		}
 
 	}
+
 	private void doNewVersionUpdate() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("当前版本:");
@@ -400,13 +429,19 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 								pBar.setTitle("正在下载");
 								pBar.setMessage("请稍候...");
 								pBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-								downFile(CaiCai.BASE_URL + "/" + new_apkname);
+								
+								Message msg = new Message();
+								// 这三句可以传递数据
+								Bundle data = new Bundle();
+								data.putString("url", CaiCai.server_host + "/" + new_apkname);// COUNT是标签,handleMessage中使用
+								msg.setData(data);
+								mHandler.sendMessage(msg);
 							}
 
 						}).setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// 点击"取消"按钮之后退出程序
-//						finish();
+						// finish();
 					}
 				}).create();// 创建
 		// 显示对话框
@@ -415,6 +450,8 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 	void downFile(final String url) {
 		pBar.show();
+
+		
 		new Thread() {
 			public void run() {
 				HttpClient client = new DefaultHttpClient();
@@ -433,10 +470,10 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 
 						byte[] buf = new byte[1024];
 						int ch = -1;
-//						int count = 0;
+//						 int count = 0;
 						while ((ch = is.read(buf)) != -1) {
 							fileOutputStream.write(buf, 0, ch);
-//							count += ch;
+//							 count += ch;
 							if (length > 0) {
 							}
 						}
@@ -446,7 +483,14 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 					if (fileOutputStream != null) {
 						fileOutputStream.close();
 					}
-					down();
+
+					down.sendMessage(new Message());
+					down.post(new Runnable() {
+						public void run() {
+							pBar.cancel();
+							update();
+						}
+					});
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -455,26 +499,8 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 			}
 
 		}.start();
-
 	}
 
-	void down() {
-		new Handler(){  
-	        @Override  
-	        public void handleMessage(Message msg) {// handler接收到消息后就会执行此方法  
-	        	if(pBar!=null){
-	    			pBar.dismiss();
-	    		}
-	        }  
-	    }.post(new Runnable() {
-			public void run() {
-				pBar.cancel();
-				update();
-			}
-		});
-
-	}
- 
 	void update() {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory(), new_apkname)), "application/vnd.android.package-archive");

@@ -121,7 +121,7 @@ public class Product {
 	}
 
 	public String getAvatar() {
-		return CaiCai.BASE_URL+avatar;
+		return CaiCai.server_host+avatar;
 	}
 
 	public void setAvatar(String avatar) {

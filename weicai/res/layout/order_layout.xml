@@ -33,6 +33,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:background="@drawable/cancel_selector"
+            android:textColor="#fff"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="取消订单"
             android:visibility="gone" />
     </RelativeLayout>
@@ -187,17 +191,6 @@
             android:textSize="15sp" >
         </TextView>
 
-        <!--
-             <TextView
-            android:id="@+id/total_title2"
-            android:layout_width="81dp"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:padding="10dp"
-            android:textColor="#666"
-            android:textSize="15sp" >
-        </TextView>
-        -->
     </LinearLayout>
 
     <TextView

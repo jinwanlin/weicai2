@@ -27,6 +27,7 @@ public abstract class BaseActivity extends FragmentActivity {
 	public static LoadingActivity loadingActivity;
 	public MainActivity mainActivity;
 	public static String baidu_user_id;
+	private static long alertTime = 0;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -54,16 +55,17 @@ public abstract class BaseActivity extends FragmentActivity {
 				BaseActivity.loadingActivity.finish();
 				BaseActivity.loadingActivity = null;
 			}
-			
+			 
 			Log.i(tag, "----------super clear");
 			
 			if (result == null || result.equals("")) {
-				if (!netStateUtils.isNetConnected()) {
-					new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("无法访问网络，请检查WIFI和3G是否打开！").setPositiveButton("确定", null).show();// show很关键
-					return;
-				} else {
-					new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("服务器异常！").setPositiveButton("确定", null).show();// show很关键
-					return;
+				if ((System.currentTimeMillis() - alertTime) > 2000) {
+					if (!netStateUtils.isNetConnected()) {
+						new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("无法访问网络，请检查WIFI和3G是否打开！").setPositiveButton("确定", null).show();// show很关键
+					} else {
+						new AlertDialog.Builder(baseActivity).setIcon(android.R.drawable.ic_dialog_alert).setTitle("提示").setMessage("服务器异常！").setPositiveButton("确定", null).show();// show很关键
+					}
+					alertTime = System.currentTimeMillis();
 				}
 			}
 		}

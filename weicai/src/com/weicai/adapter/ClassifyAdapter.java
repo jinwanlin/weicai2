@@ -36,7 +36,7 @@ public class ClassifyAdapter extends BaseAdapter {
 		this.classifies = classifies;
 		this.context = context;
 		this.mImageDownLoader = new ImageDownLoader(context);
-		this.img_base_url = CaiCai.BASE_URL+"/classify/";
+		this.img_base_url = CaiCai.server_host+"/classify/";
 	}
 
 	@Override

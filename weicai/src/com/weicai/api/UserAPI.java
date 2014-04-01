@@ -21,7 +21,7 @@ public class UserAPI extends CaiCai {
 	 * @return
 	 */
 	public static String has_validate_code() {
-		String url = BASE_URL + "/api/v2/users/has_validate_code";
+		String url = server_host + "/api/v2/users/has_validate_code";
 		return HttpUtils.doGet(url);
 	}
 	
@@ -31,7 +31,7 @@ public class UserAPI extends CaiCai {
 	 * @return
 	 */
 	public static String get_sign_up_validate_code(String phone, String validate_code) {
-		String url = BASE_URL + "/api/v2/users/get_sign_up_validate_code";
+		String url = server_host + "/api/v2/users/get_sign_up_validate_code";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[phone]", phone);
 		if (validate_code != null && !validate_code.equals("")) {
@@ -41,7 +41,7 @@ public class UserAPI extends CaiCai {
 	}
 	
 	public static String send_validate_code(String phone, String validate_code) {
-		String url = BASE_URL + "/api/v2/users/send_validate_code";
+		String url = server_host + "/api/v2/users/send_validate_code";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[phone]", phone);
 		if (validate_code != null && !validate_code.equals("")) {
@@ -52,7 +52,7 @@ public class UserAPI extends CaiCai {
 	
 	/** 找回密码中的 设置密码，无需原密码 */
 	public static String update_password(String phone, String password) {
-		String url = BASE_URL + "/api/v2/users/update_password";
+		String url = server_host + "/api/v2/users/update_password";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[phone]", phone);
 		map.put("user[password]", password);
@@ -68,7 +68,7 @@ public class UserAPI extends CaiCai {
 		if (userDao.first()==null){
 			return "";
 		}
-		String url = BASE_URL + "/api/v2/users/update_baidu_user_id";
+		String url = server_host + "/api/v2/users/update_baidu_user_id";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("baidu_user_id", BaseActivity.baidu_user_id);
 		map.put("id", userDao.first().getId()+"");
@@ -80,7 +80,7 @@ public class UserAPI extends CaiCai {
 	
 	/** 设置中的 找回密码，需原密码 */
 	public static String change_password(long user_id, String old_password, String password) {
-		String url = BASE_URL + "/api/v2/users/change_password";
+		String url = server_host + "/api/v2/users/change_password";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[id]", user_id+"");
 		map.put("user[old_password]", old_password);
@@ -96,7 +96,7 @@ public class UserAPI extends CaiCai {
 	 * @return
 	 */
 	public static String sign_in(String phone, String password) {
-		String url = BASE_URL + "/api/v2/users/sign_in";
+		String url = server_host + "/api/v2/users/sign_in";
 
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[phone]", phone);
@@ -112,7 +112,7 @@ public class UserAPI extends CaiCai {
 	 * @return
 	 */
 	public static String sign_up(String phone, String password) {
-		String url = BASE_URL + "/api/v2/users/sign_up";
+		String url = server_host + "/api/v2/users/sign_up";
 
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user[phone]", phone);
