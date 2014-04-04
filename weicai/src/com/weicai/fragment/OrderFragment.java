@@ -28,7 +28,6 @@ import com.weicai.activity.BaseActivity.NetTask;
 import com.weicai.activity.LoadingActivity;
 import com.weicai.activity.MainActivity;
 import com.weicai.adapter.OrderItemListAdapter;
-import com.weicai.adapter.ProductListAdapter;
 import com.weicai.api.CaiCai;
 import com.weicai.api.OrderAPI;
 import com.weicai.bean.Order;
@@ -123,6 +122,15 @@ public class OrderFragment extends Fragment implements OnClickListener {
 
 		@Override
 		protected String doInBackground(Integer... params) {
+			try {
+				Intent intent = new Intent();
+				MainActivity mainActivity = (MainActivity) context;
+				intent.setClass(mainActivity, LoadingActivity.class);// 跳转到加载界面
+				startActivity(intent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			return OrderAPI.cancelOrder(order_id);
 		}
 
@@ -141,7 +149,9 @@ public class OrderFragment extends Fragment implements OnClickListener {
 //					ProductFragment.last_order_state = Order.State.valueOf(json.getString("state").toUpperCase());
 //					ProductFragment.changeOrderState();
 //					((MainActivity)context).productFragment.RefreshProduct("Vegetable", null, null);
-					((MainActivity)context).searchProduct("Vegetable", null, null);
+//					((MainActivity)context).searchProduct("Vegetable", null, null);
+					
+					MainActivity.need_reload_products = true;
 					Order order = Order.jsonToOrder(json);
 					state.setText(order.getStateStr());
 					cancel_order.setVisibility(View.GONE);

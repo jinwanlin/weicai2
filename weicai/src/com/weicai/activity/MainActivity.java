@@ -60,6 +60,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	public ChangePasswordFragment changePasswordFragment;
 	private Fragment lastFragment;
 	private SearchFragment searchFragment;
+	
+	public static boolean need_reload_products = false; 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +160,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			// 当点击了消息tab时，改变控件的图片和文字颜色
 			productsImage.setImageResource(R.drawable.homes_selected);
 			productsText.setTextColor(Color.WHITE);
-			if (productFragment == null) {
+			if (productFragment == null || need_reload_products) {
 				// 如果ProductsFragment为空，则创建一个并添加到界面上
 				productFragment = new ProductFragment();
 				productFragment.setContext(this);

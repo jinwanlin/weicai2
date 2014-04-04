@@ -16,7 +16,7 @@ import com.weicai.dao.UserDao;
 
 public class SettingFragment extends Fragment {
 
-	private TextView call, user_name;
+	private TextView call, user_name, address;
 	private TextView changePassword;
 	private Button exit;
 	private MainActivity mainActivity;
@@ -32,8 +32,11 @@ public class SettingFragment extends Fragment {
 		
 		userDao = UserDao.getInstance();
 		
-		user_name = (TextView) settingLayout.findViewById(R.id.user_name);
-		user_name.setText(userDao.first().getPhone());
+//		user_name = (TextView) settingLayout.findViewById(R.id.user_name);
+//		user_name.setText(userDao.first().getPhone());
+//		
+//		address = (TextView) settingLayout.findViewById(R.id.address);
+//		address.setText(userDao.first().getAddress());
 
 		call = (TextView) settingLayout.findViewById(R.id.call);
 		call.setOnClickListener(new OnClickListener() {

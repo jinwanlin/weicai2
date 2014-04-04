@@ -30,6 +30,7 @@ public class UserDao extends SqliteDAO {
                 "CREATE TABLE IF NOT EXISTS t_user("
                 +"id         LONG PRIMARY KEY,"
                 +"name       VARCHAR(255),"
+                +"address       VARCHAR(255),"
                 +"phone       VARCHAR(255)"
                 +");";
         db.execSQL(createdb);       

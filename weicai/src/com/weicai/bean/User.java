@@ -23,6 +23,7 @@ public class User {
 	private long id;
 	private String name;
 	private String phone;
+	private String address;
 
 	/**
 	 * 非数据库字段
@@ -62,6 +63,14 @@ public class User {
 		this.phone = phone;
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public static User jsonToUser(JSONObject obj) {
 		User user = null;
 		if (obj != null) {
@@ -70,6 +79,7 @@ public class User {
 				user.setId(obj.getLong("id"));
 				user.setName(obj.getString("name"));
 				user.setPhone(obj.getString("phone"));
+				user.setAddress(obj.getString("address"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

@@ -159,10 +159,16 @@ public class ProductListAdapter extends BaseAdapter {
 			}
 		});
 		
+		
+		
 		/* 为Button添加点击事件 */
 		holder.bt.setOnClickListener(btOnclickLisener(position, holder));
-
-
+		
+		if(ProductFragment.last_order_state==null || ProductFragment.last_order_state == Order.State.PENDING){
+			
+		}else{
+			holder.bt.setClickable(false);
+		}
 
 		return convertView;
 	}

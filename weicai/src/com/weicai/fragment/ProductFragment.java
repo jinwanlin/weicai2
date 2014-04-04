@@ -82,7 +82,7 @@ public class ProductFragment extends Fragment {
 		search_ll.setOnClickListener(searchButtonListner());
 		product_type.setOnClickListener(productTypeButtonListner());
 
-		new refreshProductsTask().execute(0);
+		new RefreshProductsTask().execute(0);
 		return messageLayout;
 	}
 
@@ -137,7 +137,7 @@ public class ProductFragment extends Fragment {
 				type = "Vegetable";
 				classify = null;
 				searchKey = null;
-				new refreshProductsTask().execute(0);
+				new RefreshProductsTask().execute(0);
 			}
 		};
 	}
@@ -159,7 +159,7 @@ public class ProductFragment extends Fragment {
 	/**
 	 * 刷新商品列表
 	 */
-	private class refreshProductsTask extends NetTask {
+	private class RefreshProductsTask extends NetTask {
 
 		@Override
 		protected String doInBackground(Integer... params) {
@@ -316,6 +316,15 @@ public class ProductFragment extends Fragment {
 
 		@Override
 		protected String doInBackground(Integer... params) {
+			try {
+				Intent intent = new Intent();
+				MainActivity mainActivity = (MainActivity) context;
+				intent.setClass(mainActivity, LoadingActivity.class);// 跳转到加载界面
+				startActivity(intent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			return OrderAPI.autoMakeOrder();
 		}
 
@@ -329,7 +338,7 @@ public class ProductFragment extends Fragment {
 			type = "Vegetable";
 			classify = null;
 			searchKey = null;
-			new refreshProductsTask().execute(0);
+			new RefreshProductsTask().execute(0);
 		}
 
 	}
@@ -359,6 +368,15 @@ public class ProductFragment extends Fragment {
 
 		@Override
 		protected String doInBackground(Integer... params) {
+			try {
+				Intent intent = new Intent();
+				MainActivity mainActivity = (MainActivity) context;
+				intent.setClass(mainActivity, LoadingActivity.class);// 跳转到加载界面
+				startActivity(intent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			return OrderAPI.submitOrder(last_order_id);
 		}
 
@@ -421,6 +439,15 @@ public class ProductFragment extends Fragment {
 
 		@Override
 		protected String doInBackground(Integer... params) {
+			try {
+				Intent intent = new Intent();
+				MainActivity mainActivity = (MainActivity) context;
+				intent.setClass(mainActivity, LoadingActivity.class);// 跳转到加载界面
+				startActivity(intent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			return OrderAPI.continueBuy(last_order_id);
 		}
 

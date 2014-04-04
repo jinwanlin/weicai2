@@ -50,7 +50,7 @@ public class SignInActivity extends BaseActivity implements OnClickListener {
 	private EditText passwordText;
 	private EditText userNameText;
 	private UserDao userDao;
-	private boolean isTest = true;
+	private boolean isTest = false;
 	
 	@SuppressLint("NewApi")
 	@Override
